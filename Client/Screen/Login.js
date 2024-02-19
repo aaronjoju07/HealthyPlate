@@ -1,14 +1,21 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image, Dimensions } from 'react-native';
 import { useFonts, KaushanScript_400Regular } from '@expo-google-fonts/kaushan-script';
+import { useNavigation } from '@react-navigation/native'; 
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+
+import { faApple, faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 const { width, height } = Dimensions.get("window");
 
 const Login = () => {
+  const navigation = useNavigation();
+  const pressLogin = () => {
+    navigation.navigate('TabNavigation');
+  }
   let [fontsLoaded, fontError] = useFonts({
     KaushanScript_400Regular
   });
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.circleContainer}>
@@ -30,7 +37,7 @@ const Login = () => {
         <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} />
       </View>
 
-      <TouchableOpacity style={styles.loginButton} onPress={() => console.log('Login')}>
+      <TouchableOpacity style={styles.loginButton} onPress={() => pressLogin()}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.registerButton} onPress={() => console.log('Register')}>
@@ -45,10 +52,16 @@ const Login = () => {
 
       {/* Include your Google and Apple sign-in buttons here */}
       <TouchableOpacity style={styles.socialButton} onPress={() => console.log('Login')}>
-        <Text style={styles.buttonText}>SigIn With Google</Text>
+        <FontAwesomeIcon icon={faGoogle} color='white' size={20} />
+        <Text style={[styles.buttonText, { marginLeft: 10 }]}>
+          SignIn With Google
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.socialButton} onPress={() => console.log('Register')}>
-        <Text style={styles.buttonText}>SigIn With Apple</Text>
+        <FontAwesomeIcon icon={faApple} color='white' size={20} />
+        <Text style={[styles.buttonText, { marginLeft: 10 }]}>
+          SignIn With Apple
+        </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -131,6 +144,8 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
     marginVertical: 10,
+    flexDirection: 'row', 
+    justifyContent: 'center', 
   },
   buttonText: {
     color: 'white',
