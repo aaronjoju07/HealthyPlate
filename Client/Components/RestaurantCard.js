@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 const RestaurantCard = ({ restaurant }) => {
   return (
     <View style={styles.restaurantCard}>
-      <Image style={styles.restaurantImage} source={restaurant.image} />
+      {/* <Image style={styles.restaurantImage} source={require(restaurant.image)} /> */}
       <Text style={styles.restaurantName}>{restaurant.name}</Text>
       <Text style={styles.restaurantLocation}>{restaurant.location}</Text>
       <Text style={styles.restaurantRating}>Rating: {restaurant.rating}</Text>

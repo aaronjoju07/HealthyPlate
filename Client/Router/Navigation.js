@@ -9,6 +9,7 @@ import ProfileScreen from '../Screen/ProfileScreen';
 import RestaurantScreen from '../Screen/Resturant/ResturantScreen';
 import Menu from '../Screen/Resturant/Menu';
 import OrderScreen from '../Screen/OrderScreen';
+import Registration from '../Screen/Registration';
 
 const Navigation = () => {
     const Stack = createNativeStackNavigator();
@@ -17,6 +18,7 @@ const Navigation = () => {
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Splash" component={Splash} />
                 <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Registration" component={Registration} />
                 <Stack.Screen name="TabNavigation" component={TabNavigation} />
                 <Stack.Screen name="Favorates"  component={Favorates} />
                 {/* <Stack.Screen name="Profile"  component={ProfileScreen} /> */}

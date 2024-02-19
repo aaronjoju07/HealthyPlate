@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Icon from 'react-native-feather'; // Import feather icons
 import CustomCarousel from '../Components/CustomCarousel';
 import restaurantsData from '../Data/restaurantsData.json'
-
-
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import RestaurantCard from '../Components/RestaurantCard';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,7 +23,20 @@ const { width, height } = Dimensions.get("window");
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const goToResturant = ()=>{
+  const [UserData, setUserData] = useState([])
+  const getUserData = async () => {
+    const token = await AsyncStorage.getItem('token')
+    axios.post('http://localhost:5001/logined-in-user',{token:token}).then((res)=>{
+      setUserData(res.data.data)
+    })
+
+  }
+  useEffect(() => {
+    getUserData()
+  }, [])
+
+
+  const goToResturant = () => {
     navigation.navigate('RestaurantScreen');
   }
   return (
@@ -41,7 +54,7 @@ const HomeScreen = () => {
 
         <ScrollView style={[styles.restaurantScrollView]} showsHorizontalScrollIndicator={false} horizontal >
           {restaurantsData.map((restaurant, index) => (
-            <TouchableOpacity key={index} onPress={()=>goToResturant()}>
+            <TouchableOpacity key={index} onPress={() => goToResturant()}>
               <RestaurantCard key={index} restaurant={restaurant} />
             </TouchableOpacity>
           ))}
@@ -66,7 +79,7 @@ const Tab = createBottomTabNavigator();
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#fff',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     width: width
@@ -109,7 +122,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 10,
+    backgroundColor: 'white', // Add a background color
+    elevation: 5, // Adjust the elevation as needed
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
   },
+
   restaurantImage: {
     width: '100%',
     height: 100,
@@ -153,10 +173,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
-    backgroundColor:'rgba(255, 199, 0, 0.25)',
-    marginBottom:6,
-    margin:9,
-    borderRadius:13,
+    backgroundColor: 'rgba(255, 199, 0, 0.25)',
+    marginBottom: 6,
+    margin: 9,
+    borderRadius: 13,
   },
   likeIcon: {
     marginLeft: 10,

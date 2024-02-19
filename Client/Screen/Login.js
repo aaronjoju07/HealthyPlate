@@ -1,17 +1,32 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image, Dimensions, Alert } from 'react-native';
 import { useFonts, KaushanScript_400Regular } from '@expo-google-fonts/kaushan-script';
-import { useNavigation } from '@react-navigation/native'; 
+import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-
+import axios from 'axios'
 import { faApple, faGoogle } from '@fortawesome/free-brands-svg-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const { width, height } = Dimensions.get("window");
 
 const Login = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const userData = { email, password }
   const pressLogin = () => {
-    navigation.navigate('TabNavigation');
+    if (email.length == 0 && password.length == 0) {
+      Alert.alert('Input email and password')
+    } else {
+      axios.post('http://localhost:5001/login', userData).then((res) => {
+        // console.log(res.data)
+        if (res.data.status == 'ok') {
+          AsyncStorage.setItem("token",res.data.data)
+          Alert.alert('Login Successfull')
+          navigation.navigate('TabNavigation');
+        }
+      })
+    }
   }
   let [fontsLoaded, fontError] = useFonts({
     KaushanScript_400Regular
@@ -33,14 +48,14 @@ const Login = () => {
       </View>
 
       <View style={styles.textInputContainer}>
-        <TextInput style={styles.input} placeholder="Email" />
-        <TextInput style={styles.input} placeholder="Password" secureTextEntry={true} />
+        <TextInput style={styles.input} autoCapitalize="none"  onChangeText={(text) => setEmail(text)} value={email} placeholder="Email" />
+        <TextInput style={styles.input} autoCapitalize="none"  placeholder="Password" value={password} onChangeText={(text) => setPassword(text)} secureTextEntry={true} />
       </View>
 
       <TouchableOpacity style={styles.loginButton} onPress={() => pressLogin()}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText} >Login</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.registerButton} onPress={() => console.log('Register')}>
+      <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Registration')}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
 
@@ -144,8 +159,8 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
     marginVertical: 10,
-    flexDirection: 'row', 
-    justifyContent: 'center', 
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   buttonText: {
     color: 'white',
