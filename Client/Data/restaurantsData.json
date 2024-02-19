@@ -1,0 +1,13 @@
+[
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 1", "location": "Location 1", "rating": 4.5 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 2", "location": "Location 2", "rating": 4.2 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 1", "location": "Location 1", "rating": 4.5 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 2", "location": "Location 2", "rating": 4.2 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 1", "location": "Location 1", "rating": 4.5 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 2", "location": "Location 2", "rating": 4.2 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 1", "location": "Location 1", "rating": 4.5 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 2", "location": "Location 2", "rating": 4.2 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 1", "location": "Location 1", "rating": 4.5 },
+    { "image": "../assets/images/restaurant1.jpeg", "name": "Restaurant 2", "location": "Location 2", "rating": 4.2 }
+  ]
+  

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Icon from 'react-native-feather'; // Import feather icons
 import CustomCarousel from '../Components/CustomCarousel';
+import restaurantsData from '../Data/restaurantsData.json'
 
 
 import RestaurantCard from '../Components/RestaurantCard';
@@ -18,19 +19,7 @@ const carouselData = [
   { image: require('../assets/images/carousel3.jpeg') },
 ];
 const { width, height } = Dimensions.get("window");
-const restaurantsData = [
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 1', location: 'Location 1', rating: 4.5 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 2', location: 'Location 2', rating: 4.2 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 1', location: 'Location 1', rating: 4.5 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 2', location: 'Location 2', rating: 4.2 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 1', location: 'Location 1', rating: 4.5 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 2', location: 'Location 2', rating: 4.2 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 1', location: 'Location 1', rating: 4.5 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 2', location: 'Location 2', rating: 4.2 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 1', location: 'Location 1', rating: 4.5 },
-  { image: require('../assets/images/restaurant1.jpeg'), name: 'Restaurant 2', location: 'Location 2', rating: 4.2 },
-  // Add more restaurant data as needed
-];
+
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -41,17 +30,6 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar style='rgba(255, 199, 0, 0.25' />
       <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false} >
-
-        {/* Profile icon and profile-like symbol */}
-        {/* <View style={styles.profileIconsContainer}>
-          <TouchableOpacity>
-            <Icon.Heart size={24} strokeWidth={1} onPress={() => navigation.navigate('Favorates')} color="black" style={styles.likeIcon} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Icon.User size={24} color="black" style={{ margin: 3 }} onPress={() => navigation.navigate('Profile')} />
-          </TouchableOpacity>
-        </View> */}
-
         <CustomCarousel data={carouselData} />
 
         <View style={styles.headingContainer}>
@@ -68,9 +46,6 @@ const HomeScreen = () => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-{/* <View style={styles.labelContainer}>
-        <Text style={styles.label}>Trackers</Text>
-</View> */}
 
         {/* Line charts */}
         <View style={styles.lineChartContainer}>
