@@ -1,5 +1,29 @@
 const mongoose = require('mongoose');
 
+// Define the tracking schema
+const trackingSchema = new mongoose.Schema({
+  trackingType: {
+    type: String,
+    required: true,
+  },
+  currentWeight: {
+    type: Number,
+    required: true,
+  },
+  targetedWeight: {
+    type: Number,
+    required: true,
+  },
+  height: {
+    type: Number,
+    required: true,
+  },
+  age: {
+    type: Number,
+    required: true,
+  },
+});
+
 // Define the schema
 const UserSchema = new mongoose.Schema({
 
@@ -20,7 +44,14 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
-  }
+  },
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Restaurant',
+  }],
+  tracking: {
+    type: trackingSchema,
+  },
 });
 
 // Create a model from the schema

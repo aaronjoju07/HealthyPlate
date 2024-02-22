@@ -38,7 +38,7 @@ const Registration = () => {
   };
 
   const validatePhone = () => {
-    const regex = /^[0-9]{9}$/;
+    const regex = /^\d{10}$/;
     setPhoneValid(regex.test(phoneNumber));
   };
 
