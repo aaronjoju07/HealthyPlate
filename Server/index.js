@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt')
 const User = require('./model/userTable');
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
+const { Restaurant } = require('./model/RestaurantModel');
 
 
 dotenv.config();
@@ -96,6 +97,70 @@ app.post('/logined-in-user', (req, res) => {
         res.send({ status: "error", data: error })
     }
 })
+
+// Test: Add a new user entire details
+
+app.post('/addUserDetails', async (req, res) => {
+    try {
+        const { name, email, phoneNumber, password, favorites, tracking } = req.body;
+
+        // Create a new user instance
+        const newUser = new User({
+            username: name,
+            email,
+            phnum: phoneNumber,
+            password,
+            favorites,
+            tracking,
+        });
+
+        // Save the user to the database
+        const savedUser = await newUser.save();
+
+        res.status(201).json(savedUser);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post('/resturant-details', async (req, res) => {
+    try {
+        const { restaurantName,
+            address,
+            overallRating,
+            imageAddress,
+            about,
+            open,
+            openingTime,
+            closingTime,
+            reviews,
+            menu } = req.body;
+
+        // Create a new user instance
+        const newResturant = new Restaurant({
+            restaurantName,
+            address,
+            overallRating,
+            imageAddress,
+            about,
+            open,
+            openingTime,
+            closingTime,
+            reviews,
+            menu
+        });
+
+        // Save the user to the database
+        const savedResturant = await newResturant.save();
+
+        res.status(201).json(savedResturant);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 // Port Initilization
 
