@@ -23,4 +23,3 @@ const weightSchema = new mongoose.Schema({
 const Weight = mongoose.model('Weight', weightSchema);
 
 module.exports = { Weight };
-
