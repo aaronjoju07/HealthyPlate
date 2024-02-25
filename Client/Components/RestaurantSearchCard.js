@@ -15,9 +15,9 @@ const RestaurantSearchCard = ({ name, location, rating, price, imageSource }) =>
         <Text style={{ color: 'white' }}>{rating} <FontAwesomeIcon icon={faStar} color='white' size={12} /></Text>
       </View>
     </View>
-    <View style={{ borderWidth:1,borderColor: 'orange', padding: 5, borderRadius: 5, marginTop: 5,justifyContent:'center',alignItems:'center'}}>
+    {/* <View style={{ borderWidth:1,borderColor: 'orange', padding: 5, borderRadius: 5, marginTop: 5,justifyContent:'center',alignItems:'center'}}>
       <Text style={{ color: 'black' }}>Avg Price: {price}</Text>
-    </View>
+    </View> */}
   </View>
 );
 

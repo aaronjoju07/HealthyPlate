@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Icon from 'react-native-feather'; // Import feather icons
 import CustomCarousel from '../Components/CustomCarousel';
-import restaurantsData from '../Data/restaurantsData.json'
+import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import RestaurantCard from '../Components/RestaurantCard';
@@ -11,8 +11,9 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WorkoutTracker from '../Components/WorkoutTracker';
 import { StatusBar } from 'expo-status-bar';
+import { getUser, setUser } from '../reducer/User/userSlice';
 
-// Sample data for carousel and restaurant cards
+// carousel for restaurant 
 const carouselData = [
   { image: require('../assets/images/carousel1.jpeg') },
   { image: require('../assets/images/carousel2.jpeg') },
@@ -24,20 +25,31 @@ const { width, height } = Dimensions.get("window");
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [UserData, setUserData] = useState([])
+  const dispatch = useDispatch()
+  
+  
+  const [Resturants, setResturants] = useState([])
   const getUserData = async () => {
     const token = await AsyncStorage.getItem('token')
-    axios.post('http://localhost:5001/logined-in-user',{token:token}).then((res)=>{
+    axios.post('http://localhost:5001/logined-in-user', { token: token }).then((res) => {
       setUserData(res.data.data)
+      dispatch(setUser(res.data.data));
     })
-
+  }
+// Resturant Data  Fetching
+  const getResturantData = () => {
+    axios.get('http://localhost:5001/getAllRestaurants').then((res) => {
+      setResturants(res.data.data)
+    })
   }
   useEffect(() => {
     getUserData()
+    getResturantData()
   }, [])
-
-
-  const goToResturant = () => {
-    navigation.navigate('RestaurantScreen');
+// Redux-User  state is used to check if the user has logged
+  // const user = useSelector((state) => state.user.user);
+  const goToResturant = (restaurant) => {
+    navigation.navigate('RestaurantScreen', { restaurant });
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -52,13 +64,13 @@ const HomeScreen = () => {
         </View>
 
 
-        <ScrollView style={[styles.restaurantScrollView]} showsHorizontalScrollIndicator={false} horizontal >
-          {restaurantsData.map((restaurant, index) => (
-            <TouchableOpacity key={index} onPress={() => goToResturant()}>
+        {Resturants ? <ScrollView style={[styles.restaurantScrollView]} showsHorizontalScrollIndicator={false} horizontal >
+          {Resturants.map((restaurant, index) => (
+            <TouchableOpacity key={index} onPress={() => goToResturant(restaurant)}>
               <RestaurantCard key={index} restaurant={restaurant} />
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </ScrollView> : null}
 
         {/* Line charts */}
         <View style={styles.lineChartContainer}>

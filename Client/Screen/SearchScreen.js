@@ -1,49 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Icon from "react-native-feather";
 import RestaurantSearchCard from '../Components/RestaurantSearchCard';
+import axios from 'axios';
 
 const SearchScreen = () => {
+  // State for search functionality
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const cityName = "YourCity";
+
+  // State for categories
   const categories = ["Category1", "Category2", "Category3", "Category4", "Category5", "Category6", "Category7", "Category8", "Category9"];
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  // State for restaurant data
+  const [restaurants, setRestaurants] = useState([]);
+
+  // Fetch restaurant data
+  const getRestaurantData = () => {
+    axios.get('http://localhost:5001/getAllRestaurants').then((res) => {
+      setRestaurants(res.data.data)
+    })
+  }
+
+  useEffect(() => {
+    getRestaurantData();
+  }, []);
+
+  // Handle search input
   const handleSearch = (query) => {
-    // Implement your search logic and update searchResults state
-    // const filteredResults = yourSearchFunction(query);
-    // setSearchResults(filteredResults);
+    const filteredResults = restaurants.filter((restaurant) => {
+      const nameMatch = restaurant.restaurantName.toLowerCase().includes(query.toLowerCase());
+      const addressMatch = restaurant.address.toLowerCase().includes(query.toLowerCase());
+      return nameMatch || addressMatch;
+    });
+
+    setSearchResults(filteredResults);
   };
 
-  const restaurantList = [
-    { name: "Restaurant 1", location: "Location 1", rating: "4.5", price: "$20", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 2", location: "Location 2", rating: "4.0", price: "$25", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 1", location: "Location 1", rating: "4.5", price: "$20", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 2", location: "Location 2", rating: "4.0", price: "$25", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 1", location: "Location 1", rating: "4.5", price: "$20", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 2", location: "Location 2", rating: "4.0", price: "$25", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 1", location: "Location 1", rating: "4.5", price: "$20", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 2", location: "Location 2", rating: "4.0", price: "$25", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 1", location: "Location 1", rating: "4.5", price: "$20", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    { name: "Restaurant 2", location: "Location 2", rating: "4.0", price: "$25", imageSource: "https://www.restolacuisine.com/restaurants/restaurant-la-cuisine/website/images/Lacuisine_resto.jpg" },
-    // Add more restaurants as needed
-  ];
-
+  // Handle category press
   const handleCategoryPress = (category) => {
     setSelectedCategory(category);
     // Additional logic if needed when a category is selected
   };
 
-  const renderResultItem = ({ item }) => (
-    <View style={{ padding: 10 }}>
-      <Text>{item}</Text>
-    </View>
-  );
-
   return (
-    <SafeAreaView style={{ flex: 1, padding: 5,backgroundColor:'#fff' }}>
+    <SafeAreaView style={{ flex: 1, padding: 5, backgroundColor: '#fff' }}>
       {/* Search Component */}
       <View style={{ flex: 0.1, flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
         <TouchableOpacity style={{ marginRight: 10 }}>
@@ -96,15 +99,14 @@ const SearchScreen = () => {
 
       {/* Restaurant Cards */}
       <ScrollView style={{ flex: 4, marginTop: -5 }} showsVerticalScrollIndicator={false}>
-        {restaurantList.map((restaurant, index) => (
+        {restaurants.map((restaurant, index) => (
           <TouchableOpacity key={index}>
             <RestaurantSearchCard
               key={index}
-              name={restaurant.name}
-              location={restaurant.location}
-              rating={restaurant.rating}
-              price={restaurant.price}
-              imageSource={restaurant.imageSource}
+              name={restaurant.restaurantName}
+              location={restaurant.address}
+              rating={restaurant.overallRating}
+              imageSource={restaurant.imageAddress}
             />
           </TouchableOpacity>
         ))}

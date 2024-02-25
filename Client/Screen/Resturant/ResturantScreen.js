@@ -1,30 +1,43 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
+import ReviewCard from '../../Components/ReviewCard';
+import CartIcon from '../../Components/Cart/CartIcon';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, clearCart, removeFromCart } from '../../reducer/cart/cartSlice.js';
+import ReviewInput from '../../Components/Review/ReviewInput.js';
 
-const MenuItem = ({ itemName, itemImage }) => {
+const MenuItem = ({ itemName, itemImage, dish }) => {
     const navigation = useNavigation();
     const [quantity, setQuantity] = useState(0);
+    const dispatch = useDispatch();
+    const cartItems = useSelector((state) => state.cart.items);
 
     const incrementQuantity = () => {
         setQuantity(quantity + 1);
+        dispatch(addToCart({ dish, quantity: 1 }));
     };
 
     const decrementQuantity = () => {
         if (quantity > 0) {
             setQuantity(quantity - 1);
         }
+        const existingItem = cartItems.find(item => item.dish.dishName === dish.dishName);
+
+        if (existingItem) {
+            dispatch(removeFromCart(dish.dishName));
+        }
     };
-const goToMenu = () =>{
-    navigation.navigate('Menu')
-}
+    const goToMenu = () => {
+        navigation.navigate('Menu', { item: dish });
+    }
     return (
         <View style={styles.menuItem}>
-            <View style={{flexDirection:'row'}}>
-            <TouchableOpacity  onPress={()=>goToMenu()}>
-                <Image source={{ uri: itemImage }} style={styles.menuItemImage} />
-                <Text>{itemName}</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity onPress={() => goToMenu()}>
+                    <Image source={{ uri: itemImage }} style={styles.menuItemImage} />
+                    <Text>{itemName}</Text>
+                </TouchableOpacity>
             </View>
             <View style={styles.quantityContainer}>
                 <TouchableOpacity onPress={decrementQuantity}>
@@ -39,65 +52,117 @@ const goToMenu = () =>{
     );
 };
 
-const RestaurantScreen = () => {
+const RestaurantScreen = ({ route }) => {
+    const { restaurant } = route.params;
+    const navigation = useNavigation();
+    const dispatch = useDispatch();
+    const [userReview, setUserReview] = useState({
+        comment: '',
+        rating: 0,
+    });
+    const handleReviewSubmit = () => {
+        // Validate review inputs (you can add more validation logic)
+        if (!userReview.comment || userReview.rating === 0) {
+            Alert.alert('Incomplete Review', 'Please provide both comment and rating.');
+            return;
+        }
+
+        // Add the user's review to the restaurant's reviews
+        const updatedReviews = [...restaurant.reviews, userReview];
+
+        // Perform any other necessary logic (e.g., send data to server, update state, etc.)
+
+        // Clear the review input fields
+        setUserReview({
+            comment: '',
+            rating: 0,
+        });
+
+        Alert.alert('Review Submitted', 'Thank you for your feedback!');
+    };
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+            // Prevent default behavior of leaving the screen
+            e.preventDefault();
+
+            // Log the action
+            dispatch(clearCart());
+            console.log('User navigated back from RestaurantScreen');
+
+            // Continue with the navigation
+            navigation.dispatch(e.data.action);
+        });
+    }, [])
+
     return (
+        <View style={styles.container}>
+            <CartIcon />
 
-        <ScrollView style={styles.container}>
-            {/* Restaurant Image */}
-            <Image
-                source={{
-                    uri:
-                        'https://assets.cntraveller.in/photos/651e65983734f323ef3d37fe/16:9/w_7936,h_4464,c_limit/SWING-9.jpg',
-                }}
-                style={styles.restaurantImage}
-            />
+            <ScrollView >
 
-            {/* Restaurant Information */}
-            <View style={styles.restaurantInfo}>
-                <Text style={styles.restaurantName}>Delicious Delights</Text>
-                <Text style={styles.restaurantLocation}>123 Main Street, Cityville</Text>
-                <Text style={styles.restaurantRating}>Rating: 4.5</Text>
-            </View>
+                {/* Restaurant Image */}
+                <Image
+                    source={{
+                        uri:
+                            restaurant.imageAddress,
+                    }}
+                    style={styles.restaurantImage}
+                />
 
-            {/* Menu Categories */}
-            <View style={styles.menuContainer}>
-                <Text style={styles.menuHeader}>Menu</Text>
-
-                {/* Category 1 */}
-                <View style={styles.menuCategory}>
-                    <Text style={styles.categoryTitle}>Appetizers</Text>
-                    {/* Add menu items for this category */}
-                    <MenuItem itemName="Item 1" itemImage="https://img.delicious.com.au/EEJ2ozkv/del/2020/10/green-tea-noodles-with-sticky-sweet-chilli-salmon-140868-2.jpg" />
-                    <MenuItem itemName="Item 2" itemImage="https://img.delicious.com.au/lVWC7cYc/del/2023/02/p85-sesame-crusted-tuna-with-green-tea-noodle-salad-183897-1.png" />
-                    {/* ... */}
+                {/* Restaurant Information */}
+                <View style={styles.restaurantInfo}>
+                    <Text style={styles.restaurantName}>{restaurant.restaurantName}</Text>
+                    <Text style={styles.restaurantLocation}>{restaurant.address}</Text>
+                    <Text style={styles.restaurantRating}>Rating:{restaurant.overallRating}</Text>
                 </View>
 
-                {/* Category 2 */}
-                <View style={styles.menuCategory}>
-                    <Text style={styles.categoryTitle}>Main Course</Text>
-                    {/* Add menu items for this category */}
-                    <MenuItem itemName="Item 3" itemImage="https://img.delicious.com.au/lVWC7cYc/del/2023/02/p85-sesame-crusted-tuna-with-green-tea-noodle-salad-183897-1.png" />
-                    <MenuItem itemName="Item 4" itemImage="https://img.delicious.com.au/EEJ2ozkv/del/2020/10/green-tea-noodles-with-sticky-sweet-chilli-salmon-140868-2.jpg" />
-                    {/* ... */}
+                {/* Restaurant Menu */}
+                <View style={styles.menuContainer}>
+                    <Text style={styles.menuHeader}>Menu</Text>
+
+                    {restaurant.menu.map((category) => (
+                        <View key={category.menuCategory} style={styles.menuCategory}>
+                            <Text style={styles.categoryTitle}>{category.menuCategory}</Text>
+                            {/* Display menu items for this category */}
+                            {restaurant.menu.map((dish) => (
+                                dish.menuCategory === category.menuCategory ? (
+                                    <MenuItem
+                                        key={dish.dishName}
+                                        itemName={dish.dishName}
+                                        itemImage={dish.imageUrl}
+                                        dish={dish}
+                                    />
+                                ) : null
+                            ))}
+
+
+
+                        </View>
+                    ))}
                 </View>
 
-                {/* Add more categories as needed */}
-            </View>
+                {/* About Section */}
+                <View style={styles.aboutContainer}>
+                    <Text style={styles.aboutHeader}>About Us</Text>
+                    <Text style={styles.aboutText}>
+                        {restaurant.about}
+                    </Text>
+                </View>
 
-            {/* About Section */}
-            <View style={styles.aboutContainer}>
-                <Text style={styles.aboutHeader}>About Us</Text>
-                <Text style={styles.aboutText}>
-                    Welcome to Delicious Delights! We take pride in serving delicious and high-quality meals to our customers.
-                </Text>
-            </View>
+                {/* Reviews Section */}
+                {/* User Review Input */}
+                <ReviewInput />
+                {/* Restaurant Reviews */}
+                <View style={styles.reviewsContainer}>
+                    <Text style={styles.reviewsHeader}>Customer Reviews</Text>
+                    {/* Add review components here */}
+                    {restaurant.reviews.map((rest, index) => (
+                        <ReviewCard key={index} comment={rest.comment} rating={rest.rating} />
+                    ))}
 
-            {/* Reviews Section */}
-            <View style={styles.reviewsContainer}>
-                <Text style={styles.reviewsHeader}>Customer Reviews</Text>
-                {/* Add review components here */}
-            </View>
-        </ScrollView>
+                </View>
+            </ScrollView>
+        </View>
     );
 };
 
@@ -185,6 +250,32 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 12,
+    },
+    reviewInputContainer: {
+        padding: 16,
+        backgroundColor: '#fff',
+        marginBottom: 16,
+        borderRadius: 8,
+        elevation: 2,
+    },
+    ratingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    ratingInput: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        marginRight: 8,
+    },
+    submitReviewButton: {
+        backgroundColor: 'rgba(0, 128, 0, 0.8)',
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
     },
 });
 

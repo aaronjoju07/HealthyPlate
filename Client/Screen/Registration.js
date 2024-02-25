@@ -28,18 +28,18 @@ const Registration = () => {
   const [passwordValid, setPasswordValid] = useState(true);
 
   const validateName = () => {
-    const regex = /^[a-zA-Z]{3,}$/;
-    setNameValid(regex.test(name));
+    const nameRegex = /^[a-zA-Z]{3,}$/;
+    setNameValid(nameRegex.test(name));
   };
 
   const validateEmail = () => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setEmailValid(regex.test(email));
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setEmailValid(emailRegex.test(email));
   };
 
   const validatePhone = () => {
-    const regex = /^\d{10}$/;
-    setPhoneValid(regex.test(phoneNumber));
+    const phoneRegex = /^\d{11}$/;
+    setPhoneValid(phoneRegex.test(phoneNumber));
   };
 
   const validatePassword = () => {

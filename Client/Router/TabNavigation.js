@@ -17,7 +17,7 @@ const TabNavigation = () => {
     const navigation = useNavigation();
 
     return (
-        <Tab.Navigator
+        <Tab.Navigator initialRouteName='Home'
             screenOptions={{
                 tabBarShowLabel: false,
                 headerShown: false,

@@ -1,11 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser, clearUser } from '../reducer/User/userSlice';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
+  const userdata = useSelector((state) => state.user.user);
   const user = {
-    name: 'Ashwin Joshy',
+    name: userdata.username,
     avatar: { uri: 'https://images.pexels.com/photos/214574/pexels-photo-214574.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' },
     coverPhoto: { uri: 'https://images.pexels.com/photos/4552981/pexels-photo-4552981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' },
   };
@@ -28,6 +32,16 @@ const ProfileScreen = () => {
   const handleDeleteAccount = () => {
     // Handle delete account action
     // Add your logic or navigation here
+  };
+  const dispatch = useDispatch();
+  const handleLogoutAccount = () => {
+    AsyncStorage.setItem('isLogin','')
+    AsyncStorage.setItem('token','')
+    dispatch(clearUser());
+    setTimeout(() => {
+      Alert.alert('Success', 'LOGOUT successful!');
+    }, 500);
+    navigation.navigate('Login');
   };
 
   const handleFav = () => {
@@ -85,6 +99,13 @@ const ProfileScreen = () => {
 
         <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
+          onPress={handleLogoutAccount}
+        >
+          <Text style={styles.buttonText}>Logout</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.loutButton]}
           onPress={handleDeleteAccount}
         >
           <Text style={styles.buttonText}>Delete Account</Text>
@@ -147,8 +168,9 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     backgroundColor: 'rgba(255, 0, 0,.6)',
-    // position:'absolute',
-    // bottom:0
+  },
+  loutButton: {
+    backgroundColor: 'rgba(255, 0, 0,.6)',
   },
 });
 

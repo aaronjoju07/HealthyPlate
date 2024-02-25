@@ -2,33 +2,37 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const Menu = () => {
+const Menu = ({route}) => {
+  const item = route.params;
+  console.log(item.item.dish.ingredients);
   return (
     <SafeAreaView style={styles.container}>
       {/* Menu Image */}
       <Image
         source={{
-          uri: 'https://img.delicious.com.au/EEJ2ozkv/del/2020/10/green-tea-noodles-with-sticky-sweet-chilli-salmon-140868-2.jpg', // Replace with the actual image source
+          uri: item.item.imageUrl 
         }}
         style={styles.menuImage}
       />
 
       {/* Menu Information */}
       <View style={styles.menuInfo}>
-        <Text style={styles.menuName}>Delicious Dish</Text>
+        <Text style={styles.menuName}>{item.item.dishName}</Text>
         <Text style={styles.menuDescription}>
-          A mouth-watering description of the delicious dish goes here.
+          {item.item.dish.aboutDish}
+        </Text>
+        <Text style={styles.menuDescription}>
+          Meal Type : {item.item.dish.mealType}
         </Text>
         <View style={styles.nutritionInfo}>
-          {renderNutritionItem('Calories', '350', 'https://www.shutterstock.com/image-vector/kcal-fire-icon-kilocalories-sign-600nw-2387906665.jpg')}
-          {renderNutritionItem('Proteins', '20g', 'https://img.freepik.com/premium-vector/protein-icon-vector-illustration-symbol-design_609277-7180.jpg')}
-          {renderNutritionItem('Sugar', '5g', 'https://static.vecteezy.com/system/resources/previews/000/630/403/original/sugar-icon-symbol-sign-vector.jpg')}
+          {renderNutritionItem('Calories', item.item.dish.calories.toString(), 'https://www.shutterstock.com/image-vector/kcal-fire-icon-kilocalories-sign-600nw-2387906665.jpg')}
+          {renderNutritionItem('Proteins', item.item.dish.proteinContent.toString(), 'https://img.freepik.com/premium-vector/protein-icon-vector-illustration-symbol-design_609277-7180.jpg')}
+          {renderNutritionItem('Sugar',  item.item.dish.sugarContent.toString(), 'https://static.vecteezy.com/system/resources/previews/000/630/403/original/sugar-icon-symbol-sign-vector.jpg')}
         </View>
         <Text style={styles.ingredientsHeader}>Ingredients:</Text>
-        {renderIngredientItem('Ingredient 1', 'https://cdn-prod.medicalnewstoday.com/content/images/articles/322/322745/salt-shaker.jpg')}
-        {renderIngredientItem('Ingredient 2', 'https://nuttyyogi.com/cdn/shop/products/MustardSeeds.png?v=1680767117')}
-        {renderIngredientItem('Ingredient 3', 'https://www.jindeal.com/wp-content/uploads/2020/01/vedini-coconut-oil-extra-virgin.jpg')}
-        {/* Add the actual list of ingredients */}
+      {item.item.dish.ingredients.map((ingredient, index) => (
+  renderIngredientItem(ingredient.ingredientName, 'https://png.pngtree.com/png-clipart/20231115/original/pngtree-food-ingredients-sample-photo-png-image_13549224.png',keyof=ingredient._id) // Replace this URL with the actual URL for each ingredient
+))}
       </View>
     </SafeAreaView>
   );
@@ -43,9 +47,9 @@ const renderNutritionItem = (label, value, imageUrl) => {
   );
 };
 
-const renderIngredientItem = (name, imageUrl) => {
+const renderIngredientItem = (name, imageUrl,keyof) => {
   return (
-    <View style={styles.ingredientItem}>
+    <View style={styles.ingredientItem} key={keyof}>
       <Image source={{ uri: imageUrl }} style={styles.ingredientItemImage} />
       <Text>{name}</Text>
     </View>

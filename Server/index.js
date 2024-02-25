@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt')
 const User = require('./model/userTable');
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 const { Restaurant } = require('./model/RestaurantModel');
 
 
@@ -20,7 +21,20 @@ mongoose.connect(mongoUrl).then(() => {
 })
 
 app.use(express.json())
-
+app.use(cookieParser());
+// Example route to set a cookie
+app.get('/set-cookie', (req, res) => {
+    // Set a cookie with the name 'username' and value 'user123'
+    res.cookie('username', 'user123', { maxAge: 900000, httpOnly: true });
+    res.send('Cookie set successfully!');
+  });
+  
+  // Example route to retrieve a cookie
+  app.get('/get-cookie', (req, res) => {
+    // Retrieve the value of the 'username' cookie
+    const username = req.cookies.username || 'Guest';
+    res.send(`Hello, ${username}!`);
+  });
 // Routes
 
 app.get('/', (req, res) => {
@@ -81,22 +95,6 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Logined User Details
-
-app.post('/logined-in-user', (req, res) => {
-    const { token } = req.body
-    try {
-        const user = jwt.verify(token, JWT_SECRET)
-        const userEmail = user.email
-
-        User.findOne({ email: userEmail }).then((data) => {
-            res.send({ status: "ok", data: data })
-        })
-
-    } catch (error) {
-        res.send({ status: "error", data: error })
-    }
-})
 
 // Test: Add a new user entire details
 
@@ -160,6 +158,37 @@ app.post('/resturant-details', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Logined User Details
+
+app.post('/logined-in-user', (req, res) => {
+    const { token } = req.body
+    try {
+        const user = jwt.verify(token, JWT_SECRET)
+        const userEmail = user.email
+
+        User.findOne({ email: userEmail }).then((data) => {
+            res.send({ status: "ok", data: data })
+        })
+
+    } catch (error) {
+        res.send({ status: "error", data: error })
+    }
+})
+
+// Get All Resturants 
+
+app.get('/getAllRestaurants', async (req, res) => {
+    try {
+      const restos = await Restaurant.find({}).then((data)=>{
+            res.send({status:"OK",count:data.length,data:data})
+      })
+    } catch (error) {
+      console.error('Error fetching restaurants:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
 
 
 // Port Initilization

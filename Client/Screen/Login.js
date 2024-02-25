@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image, Dimensions, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image, Dimensions, Alert, ToastAndroid } from 'react-native';
 import { useFonts, KaushanScript_400Regular } from '@expo-google-fonts/kaushan-script';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -22,7 +22,11 @@ const Login = () => {
         // console.log(res.data)
         if (res.data.status == 'ok') {
           AsyncStorage.setItem("token",res.data.data)
-          Alert.alert('Login Successfull')
+          AsyncStorage.setItem("isLogin",JSON.stringify(true))
+          // Alert.alert('Login Successfull')
+          setTimeout(() => {
+            Alert.alert('Success', 'Login successful!');
+          }, 500);
           navigation.navigate('TabNavigation');
         }
       })
