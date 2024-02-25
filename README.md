@@ -1,7 +1,3 @@
-GitHub Repository Description for HealthyPlate:
-
----
-
 **HealthyPlate: Empowering Informed Dining Choices**
 
 Welcome to the HealthyPlate repository! 🥗📱
@@ -28,5 +24,3 @@ HealthyPlate is a revolutionary mobile application designed to address the chall
 Let's collaborate to revolutionize how individuals approach dining out and foster a healthier, informed community! 🌱💪
 
 **Stay Healthy, Eat Smart!**
-
----
