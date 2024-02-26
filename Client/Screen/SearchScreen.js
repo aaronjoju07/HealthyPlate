@@ -4,11 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Icon from "react-native-feather";
 import RestaurantSearchCard from '../Components/RestaurantSearchCard';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 
 const SearchScreen = () => {
   // State for search functionality
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const navigation = useNavigation();
 
   // State for categories
   const categories = ["Category1", "Category2", "Category3", "Category4", "Category5", "Category6", "Category7", "Category8", "Category9"];
@@ -44,7 +46,9 @@ const SearchScreen = () => {
     setSelectedCategory(category);
     // Additional logic if needed when a category is selected
   };
-
+  const goToResturant = (restaurant) => {
+    navigation.navigate('RestaurantScreen', { restaurant });
+  }
   return (
     <SafeAreaView style={{ flex: 1, padding: 5, backgroundColor: '#fff' }}>
       {/* Search Component */}
@@ -98,9 +102,11 @@ const SearchScreen = () => {
       </View>
 
       {/* Restaurant Cards */}
+      {searchQuery.length>0? 
+      
       <ScrollView style={{ flex: 4, marginTop: -5 }} showsVerticalScrollIndicator={false}>
-        {restaurants.map((restaurant, index) => (
-          <TouchableOpacity key={index}>
+        {searchResults.map((restaurant, index) => (
+          <TouchableOpacity key={index} onPress={() => goToResturant(restaurant)}>
             <RestaurantSearchCard
               key={index}
               name={restaurant.restaurantName}
@@ -111,6 +117,21 @@ const SearchScreen = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
+      : <ScrollView style={{ flex: 4, marginTop: -5 }} showsVerticalScrollIndicator={false}>
+      {restaurants.map((restaurant, index) => (
+        <TouchableOpacity key={index} onPress={() => goToResturant(restaurant)}>
+          <RestaurantSearchCard
+            key={index}
+            name={restaurant.restaurantName}
+            location={restaurant.address}
+            rating={restaurant.overallRating}
+            imageSource={restaurant.imageAddress}
+          />
+        </TouchableOpacity>
+      ))}
+    </ScrollView>}
+      
+
     </SafeAreaView>
   );
 };

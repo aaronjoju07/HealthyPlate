@@ -72,10 +72,8 @@ const HomeScreen = () => {
           ))}
         </ScrollView> : null}
 
-        {/* Line charts */}
+
         <View style={styles.lineChartContainer}>
-          {/* Line chart for complete goal progression */}
-          {/* <LineCharts /> */}
           <View style={{ flex: 1, flexDirection: 'row', width: width }}>
             <WorkoutTracker />
             <WorkoutTracker />
