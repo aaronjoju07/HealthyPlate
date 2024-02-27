@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Icon from "react-native-feather";
 import RestaurantSearchCard from '../Components/RestaurantSearchCard';
@@ -102,35 +102,45 @@ const SearchScreen = () => {
       </View>
 
       {/* Restaurant Cards */}
-      {searchQuery.length>0? 
-      
-      <ScrollView style={{ flex: 4, marginTop: -5 }} showsVerticalScrollIndicator={false}>
-        {searchResults.map((restaurant, index) => (
-          <TouchableOpacity key={index} onPress={() => goToResturant(restaurant)}>
-            <RestaurantSearchCard
-              key={index}
-              name={restaurant.restaurantName}
-              location={restaurant.address}
-              rating={restaurant.overallRating}
-              imageSource={restaurant.imageAddress}
-            />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      : <ScrollView style={{ flex: 4, marginTop: -5 }} showsVerticalScrollIndicator={false}>
-      {restaurants.map((restaurant, index) => (
-        <TouchableOpacity key={index} onPress={() => goToResturant(restaurant)}>
-          <RestaurantSearchCard
-            key={index}
-            name={restaurant.restaurantName}
-            location={restaurant.address}
-            rating={restaurant.overallRating}
-            imageSource={restaurant.imageAddress}
-          />
-        </TouchableOpacity>
-      ))}
-    </ScrollView>}
-      
+      {searchQuery.length > 0 ?
+        <ScrollView style={{ flex: 4, marginTop: -5 }} showsVerticalScrollIndicator={false}>
+          {searchResults.map((restaurant, index) => (
+            <TouchableOpacity key={index} onPress={() => goToResturant(restaurant)}>
+              <RestaurantSearchCard
+                key={index}
+                name={restaurant.restaurantName}
+                location={restaurant.address}
+                rating={restaurant.overallRating}
+                imageSource={restaurant.imageAddress}
+              />
+            </TouchableOpacity>
+          ))}
+          {!searchResults.length > 0 ?
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center',
+           backgroundColor:'rgba(247,251,251,255)',padding:5,margin:9,borderRadius:25
+            }}>
+            <Image style={{height:300,width:300}} source={require('../assets/images/search.png')} />
+            <View style={{padding:5}}>
+            <Text style={{fontStyle:'italic',fontWeight:20}}>Sorry, we couldn't find any matching results.</Text>
+            </View>
+
+          </View> : null
+          }
+        </ScrollView>
+        : <ScrollView style={{ flex: 4, marginTop: -5 }} showsVerticalScrollIndicator={false}>
+          {restaurants.map((restaurant, index) => (
+            <TouchableOpacity key={index} onPress={() => goToResturant(restaurant)}>
+              <RestaurantSearchCard
+                key={index}
+                name={restaurant.restaurantName}
+                location={restaurant.address}
+                rating={restaurant.overallRating}
+                imageSource={restaurant.imageAddress}
+              />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>}
+
 
     </SafeAreaView>
   );
