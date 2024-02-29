@@ -27,14 +27,14 @@ app.get('/set-cookie', (req, res) => {
     // Set a cookie with the name 'username' and value 'user123'
     res.cookie('username', 'user123', { maxAge: 900000, httpOnly: true });
     res.send('Cookie set successfully!');
-  });
-  
-  // Example route to retrieve a cookie
-  app.get('/get-cookie', (req, res) => {
+});
+
+// Example route to retrieve a cookie
+app.get('/get-cookie', (req, res) => {
     // Retrieve the value of the 'username' cookie
     const username = req.cookies.username || 'Guest';
     res.send(`Hello, ${username}!`);
-  });
+});
 // Routes
 
 app.get('/', (req, res) => {
@@ -180,17 +180,62 @@ app.post('/logined-in-user', (req, res) => {
 
 app.get('/getAllRestaurants', async (req, res) => {
     try {
-      const restos = await Restaurant.find({}).then((data)=>{
-            res.send({status:"OK",count:data.length,data:data})
-      })
+        const restos = await Restaurant.find({}).then((data) => {
+            res.send({ status: "OK", count: data.length, data: data })
+        })
     } catch (error) {
-      console.error('Error fetching restaurants:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error fetching restaurants:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
-  
+});
 
+app.get('/getRestaurantReviews/:restaurantId', async (req, res) => {
+    try {
+        const restaurantId = req.params.restaurantId;
 
+        const restaurant = await Restaurant.findById(restaurantId);
+
+        if (!restaurant) {
+            return res.status(404).json({ error: 'Restaurant not found' });
+        }
+
+        const reviews = restaurant.reviews;
+
+        res.send({ status: 'OK', count: reviews.length, data: reviews });
+    } catch (error) {
+        console.error('Error fetching restaurant reviews:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post('/restaurants/:restaurantId/reviews', async (req, res) => {
+    const { restaurantId } = req.params;
+    const { comment, ratings } = req.body;
+
+    try {
+        // Find the restaurant by ID
+        const restaurant = await Restaurant.findById(restaurantId);
+
+        if (!restaurant) {
+            return res.status(404).json({ error: 'Restaurant not found' });
+        }
+
+        // Create a new review
+        const newReview = { comment,rating: ratings };
+
+        // Add the review to the restaurant's reviews array
+        restaurant.reviews.push(newReview);
+
+        // Save the updated restaurant with the new review
+        await restaurant.save();
+
+        // Respond with the updated restaurant object
+        res.status(201).json(restaurant);
+    } catch (error) {
+        console.error('Error adding review:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 // Port Initilization
 
 app.listen(5001, () => {

@@ -1,20 +1,29 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Modal, Alert } from 'react-native';
 import * as Icon from 'react-native-feather';
+import StarRating from 'react-native-star-rating-widget';
 
-const ReviewInput = () => {
+
+const ReviewInput = ({onSubmit}) => {
   const [userReview, setUserReview] = useState({
     comment: '',
-    rating: 0,
+    ratings: 0,
   });
-
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleReviewSubmit = () => {
-    // Implement your logic for submitting the review here
-    // ...
 
-    // Close the modal after submitting the review
+  const handleReviewSubmit = () => {
+    if (!userReview.comment || userReview.ratings === 0) {
+      Alert.alert('Incomplete Review', 'Please provide both comment and rating.');
+      return;
+    }
+    // Clear the review input fields
+    setUserReview({
+      comment: '',
+      ratings: 0,
+    });
+    onSubmit(userReview)
+    // Alert.alert('Review Submitted', 'Thank you for your feedback!');
     setModalVisible(false);
   };
 
@@ -43,16 +52,12 @@ const ReviewInput = () => {
               onChangeText={(text) => setUserReview({ ...userReview, comment: text })}
               multiline
             />
-            <Text style={styles.reviewInputLabel}>Rating (1-5):</Text>
+            {/* <Text style={styles.reviewInputLabel}>Rating (1-5):</Text> */}
             <View style={styles.ratingContainer}>
-              <TextInput
-                style={styles.ratingInput}
-                placeholder="Rate"
-                value={userReview.rating.toString()}
-                onChangeText={(text) => setUserReview({ ...userReview, rating: parseInt(text) || 0 })}
-                keyboardType="numeric"
+              <StarRating
+                rating={userReview.ratings}
+                onChange={(rating) => setUserReview({ ...userReview, ratings: rating })}
               />
-              <Text>/5</Text>
             </View>
             <TouchableOpacity
               style={styles.submitReviewButton}
@@ -73,65 +78,64 @@ const ReviewInput = () => {
   );
 };
 const styles = {
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    addReviewButton: {
-      backgroundColor: 'rgba(255, 199, 0, .91)',
-      padding: 10,
-      borderRadius: 8,
-      width: '90%',
-    },
-    buttonText: {
-      color: '#fff',
-      textAlign: 'center',
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.2)',
-      padding: 20,
-    },
-    reviewInputContainer: {
-      backgroundColor: '#fff',
-      padding: 20,
-      borderRadius: 10,
-    },
-    reviewInputLabel: {
-      fontSize: 16,
-      marginBottom: 5,
-    },
-    reviewInput: {
-      borderWidth: 1,
-      borderColor: '#ccc',
-      borderRadius: 5,
-      padding: 10,
-      marginBottom: 10,
-      minHeight: 100,
-    },
-    ratingContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 10,
-    },
-    ratingInput: {
-      borderWidth: 1,
-      borderColor: '#ccc',
-      borderRadius: 5,
-      padding: 10,
-      flex: 1,
-    },
-    submitReviewButton: {
-      backgroundColor: '#27ae60',
-      padding: 10,
-      borderRadius: 5,
-    },
-    closeModalButton: {
-      position: 'absolute',
-      top: 10,
-      right: 10,
-    },
-  };
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addReviewButton: {
+    backgroundColor: 'rgba(255, 199, 0, .91)',
+    padding: 10,
+    borderRadius: 8,
+    width: '90%',
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    padding: 20,
+  },
+  reviewInputContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+  },
+  reviewInputLabel: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  reviewInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    minHeight: 100,
+  },
+  ratingContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  ratingInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    flex: 1,
+  },
+  submitReviewButton: {
+    backgroundColor: 'rgba(255, 199, 0, .91)',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeModalButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+};
 export default ReviewInput;

@@ -6,13 +6,13 @@ import CartIcon from '../../Components/Cart/CartIcon';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, clearCart, removeFromCart } from '../../reducer/cart/cartSlice.js';
 import ReviewInput from '../../Components/Review/ReviewInput.js';
+import axios from 'axios'
 
 const MenuItem = ({ itemName, itemImage, dish }) => {
     const navigation = useNavigation();
     const [quantity, setQuantity] = useState(0);
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
-
     const incrementQuantity = () => {
         setQuantity(quantity + 1);
         dispatch(addToCart({ dish, quantity: 1 }));
@@ -33,12 +33,13 @@ const MenuItem = ({ itemName, itemImage, dish }) => {
     }
     return (
         <View style={styles.menuItem}>
-            <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity onPress={() => goToMenu()}>
-                    <Image source={{ uri: itemImage }} style={styles.menuItemImage} />
-                    <Text>{itemName}</Text>
-                </TouchableOpacity>
-            </View>
+
+            <TouchableOpacity onPress={() => goToMenu()} style={styles.menuItemContainer}>
+                <Image source={{ uri: itemImage }} style={styles.menuItemImage} />
+                <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>{itemName}</Text>
+                </View>
+            </TouchableOpacity>
             <View style={styles.quantityContainer}>
                 <TouchableOpacity onPress={decrementQuantity}>
                     <Text style={styles.quantityButton}>-</Text>
@@ -56,44 +57,56 @@ const RestaurantScreen = ({ route }) => {
     const { restaurant } = route.params;
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const [userReview, setUserReview] = useState({
-        comment: '',
-        rating: 0,
-    });
-    const handleReviewSubmit = () => {
-        // Validate review inputs (you can add more validation logic)
-        if (!userReview.comment || userReview.rating === 0) {
-            Alert.alert('Incomplete Review', 'Please provide both comment and rating.');
-            return;
+    const [reviews, setReviews] = useState([]);
+    const restaurantId = restaurant._id;
+    const fetchReviews = async () => {
+        try {
+            const response = await fetch(`http://localhost:5001/getRestaurantReviews/${restaurantId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch reviews');
+            }
+
+            const data = await response.json();
+            setReviews(data.data);
+            // console.log(data.data);
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
         }
-
-        // Add the user's review to the restaurant's reviews
-        const updatedReviews = [...restaurant.reviews, userReview];
-
-        // Perform any other necessary logic (e.g., send data to server, update state, etc.)
-
-        // Clear the review input fields
-        setUserReview({
-            comment: '',
-            rating: 0,
-        });
-
-        Alert.alert('Review Submitted', 'Thank you for your feedback!');
     };
+
     useEffect(() => {
+        fetchReviews();
         const unsubscribe = navigation.addListener('beforeRemove', (e) => {
             // Prevent default behavior of leaving the screen
             e.preventDefault();
 
             // Log the action
             dispatch(clearCart());
-            console.log('User navigated back from RestaurantScreen');
+            // console.log('User navigated back from RestaurantScreen');
 
             // Continue with the navigation
             navigation.dispatch(e.data.action);
         });
     }, [])
+    const handleReviewSubmission = async (newReview) => {
 
+        try {
+            // console.log(newReview);
+            const response = await axios.post(`http://localhost:5001/restaurants/${restaurantId}/reviews`, newReview, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = response.data;
+            fetchReviews()
+            // console.log('Response from server:', data);
+            Alert.alert('Review Submitted', 'Thank you for your feedback!');
+            // fetchReviews()
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
     return (
         <View style={styles.container}>
             <CartIcon />
@@ -113,8 +126,11 @@ const RestaurantScreen = ({ route }) => {
                 <View style={styles.restaurantInfo}>
                     <Text style={styles.restaurantName}>{restaurant.restaurantName}</Text>
                     <Text style={styles.restaurantLocation}>{restaurant.address}</Text>
-                    <Text style={styles.restaurantRating}>Rating:{restaurant.overallRating}</Text>
+                    <View style={styles.ratingContainer}>
+                        <Text style={styles.restaurantRating}>Rating: {restaurant.overallRating}</Text>
+                    </View>
                 </View>
+
 
                 {/* Restaurant Menu */}
                 <View style={styles.menuContainer}>
@@ -151,12 +167,12 @@ const RestaurantScreen = ({ route }) => {
 
                 {/* Reviews Section */}
                 {/* User Review Input */}
-                <ReviewInput />
+                <ReviewInput onSubmit={handleReviewSubmission} />
                 {/* Restaurant Reviews */}
                 <View style={styles.reviewsContainer}>
                     <Text style={styles.reviewsHeader}>Customer Reviews</Text>
                     {/* Add review components here */}
-                    {restaurant.reviews.map((rest, index) => (
+                    {reviews.map((rest, index) => (
                         <ReviewCard key={index} comment={rest.comment} rating={rest.rating} />
                     ))}
 
@@ -170,7 +186,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        // marginTop:15
     },
     restaurantImage: {
         width: '100%',
@@ -178,23 +193,29 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
     },
     restaurantInfo: {
-        padding: 16,
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
     },
     restaurantName: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 8,
+        marginBottom: 5,
+        color: '#333',
     },
     restaurantLocation: {
         fontSize: 16,
-        marginBottom: 4,
+        color: '#777',
+        marginBottom: 5,
+    },
+    ratingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     restaurantRating: {
         fontSize: 16,
-        color: 'green',
-    },
-    menuContainer: {
-        padding: 16,
+        color: '#f8d12c',
+        marginRight: 5,
     },
     menuHeader: {
         fontSize: 20,
@@ -208,29 +229,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 8,
-    },
-    menuItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    menuItemImage: {
-        width: 100,
-        height: 100,
-        marginRight: 8,
-        borderRadius: 25,
-    },
-    quantityContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 'auto',
-    },
-    quantityButton: {
-        fontSize: 20,
-        marginHorizontal: 8,
-    },
-    quantity: {
-        fontSize: 16,
     },
     aboutContainer: {
         padding: 16,
@@ -277,6 +275,50 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
     },
+    menuItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+    },
+    menuItemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    menuItemImage: {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        marginRight: 10,
+    },
+    itemDetails: {
+        // flex: 1,
+    },
+    itemName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    quantityContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    quantityButton: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#007BFF',
+        paddingHorizontal: 10,
+    },
+    quantity: {
+        fontSize: 16,
+        marginHorizontal: 10,
+    },
+    menuContainer: {
+        padding: 16,
+    }
+
+
 });
 
 export default RestaurantScreen;

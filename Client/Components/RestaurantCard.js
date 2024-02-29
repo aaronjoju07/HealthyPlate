@@ -6,9 +6,13 @@ const RestaurantCard = ({ restaurant }) => {
   return (
     <View style={styles.restaurantCard}>
       <Image style={styles.restaurantImage} source={{ uri: restaurant.imageAddress }} />
-      <Text style={styles.restaurantName}>{restaurant.restaurantName}</Text>
-      <Text style={styles.restaurantLocation}>{restaurant.address}</Text>
-      <Text style={styles.restaurantRating}>Rating: {restaurant.overallRating}</Text>
+      <View style={styles.cardDetails}>
+        <Text style={styles.restaurantName}>{restaurant.restaurantName}</Text>
+        <Text style={styles.restaurantLocation}>{restaurant.address}</Text>
+        <View style={styles.ratingContainer}>
+          <Text style={styles.restaurantRating}>Rating: {restaurant.overallRating}</Text>
+        </View>
+      </View>
     </View>
   );
 };
@@ -20,38 +24,46 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 6,
-    marginRight: 3,
+    marginRight: 10,
     margin: 7,
+    backgroundColor: '#fff',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
   },
   restaurantImage: {
     width: '100%',
     height: 160,
     resizeMode: 'cover',
-    padding: 1,
-    borderRadius: 10,
-
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  cardDetails: {
+    padding: 10,
   },
   restaurantName: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 8,
+    color: '#333',
   },
   restaurantLocation: {
     fontSize: 14,
-    color: 'gray',
+    color: '#777',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
   },
   restaurantRating: {
     fontSize: 14,
-    color: 'green',
-    marginBottom: 8,
+    color: '#f8d12c',
+    marginRight: 5,
   },
 });
 
