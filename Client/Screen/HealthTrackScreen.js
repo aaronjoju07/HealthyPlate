@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, SafeAreaView, TouchableOpacity, Modal, TextInput, Button, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from "react-native-chart-kit";
+import { calculateTrackingType } from '../Service/calculateTrackingType';
+import { calculateBMI } from '../Service/calculateBMI';
+import DropdownComponent from '../Components/DropdownComponent';
+import GenderDropdown from '../Components/GenderDropdown';
+import calculateCalories from '../Service/calculateCalories';
+import { useSelector } from 'react-redux';
+import axios from 'axios'
 
 const HealthTrackScreen = () => {
+
+  const userdata = useSelector((state) => state.user.user);
+
   const [showModal, setShowModal] = useState(false);
   const [currentWeight, setCurrentWeight] = useState('');
   const [targetedWeight, setTargetedWeight] = useState('');
@@ -11,53 +21,129 @@ const HealthTrackScreen = () => {
   const [dailyProgress, setDailyProgress] = useState(60);
   const [overallProgress, setOverallProgress] = useState(40);
 
-  // New state variables for selected target information
+  const [dataSet, setdataSet] = useState(false)
   const [selectedTrackingType, setSelectedTrackingType] = useState('');
   const [selectedTargetedWeight, setSelectedTargetedWeight] = useState('');
   const [weightDifference, setWeightDifference] = useState(0);
   const [bmiResult, setBmiResult] = useState(0);
+  const [activityFactor, setactivityFactor] = useState('')
+  const [Gender, setGender] = useState('')
+  const [CalculatedCalories, setCalculatedCalories] = useState(0)
 
   const handleSetTarget = () => {
-    // Determine tracking type based on the relationship between targeted and current weight
-    const trackingType = targetedWeight < currentWeight ? 'Weight Loss' : 'Weight Gain';
-    // Update the selected target information
+    if (
+      currentWeight.trim() === '' ||
+      targetedWeight.trim() === '' ||
+      currentHeight.trim() === '' ||
+      age.trim() === '' ||
+      activityFactor.trim() == '' ||
+      Gender.trim() == ''
+    ) {
+      alert('Please fill in all the fields');
+      return;
+    }
+    const trackingType = calculateTrackingType(targetedWeight, currentWeight);
     setSelectedTrackingType(trackingType);
     setSelectedTargetedWeight(targetedWeight);
     setWeightDifference(targetedWeight - currentWeight);
-
-    // Calculate BMI and update the state
     const bmi = calculateBMI(currentWeight, currentHeight);
     setBmiResult(bmi);
-
+    const calculatedCalories = calculateCalories(currentWeight, currentHeight, age, Gender, activityFactor, trackingType)
+    setCalculatedCalories(calculatedCalories)
+    // console.log(userdata);
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    const healthTrackerData = {
+      user_id: userdata._id,
+      current_weight: currentWeight,
+      targeted_weight: targetedWeight,
+      current_height: currentHeight,
+      active_factor: activityFactor,
+      gender: Gender,
+      tracking_type: trackingType,
+      bmi_result: bmi,
+      calculated_calories: calculatedCalories,
+      daily_progression: [
+        {
+          date: formattedDate,
+          progression: 0,
+        }
+      ],
+      overall_progression: 0,
+      weight_history: [
+        {
+          date: formattedDate,
+          weight: currentWeight,
+        }
+      ],
+    };
+    axios.post(`http://localhost:5001/healthtracker`, healthTrackerData)
+      .then(response => {
+        console.log('Data posted successfully:', response.data);
+        setdataSet(true)
+      })
+      .catch(error => {
+        console.error('Error posting data:', error);
+      });
     setShowModal(false);
   };
 
-  const calculateBMI = (weight, height) => {
-    // Calculate BMI using weight (in kg) and height (in cm)
-    const heightInMeters = height / 100;
-    const bmi = weight / (heightInMeters * heightInMeters);
-    const roundedBMI = bmi.toFixed(2);
-      // Determine the BMI category
-      let category;
-      if (bmi < 18.5) {
-          category = 'Underweight';
-      } else if (bmi < 25) {
-          category = 'Normal weight';
-      } else if (bmi < 30) {
-          category = 'Overweight';
-      } else if (bmi < 35) {
-          category = 'Obesity I';
-      } else if (bmi < 40) {
-          category = 'Obesity II';
-      } else {
-          category = 'Obesity III';
-      }
-      return category;
+  const [showUpdateWeightModal, setShowUpdateWeightModal] = useState(false);
+
+  // New state variable for updated current weight
+  const [updatedCurrentWeight, setUpdatedCurrentWeight] = useState('');
+
+  // Function to handle updating current weight and adding data to chart
+  const handleUpdateWeight = () => {
+
+    setShowUpdateWeightModal(false);
   };
+  const handleGenderChange = (gender) => { setGender(gender) }
+  const handelActivityChange = (activity) => { setactivityFactor(activity) }
+  const getTrackerDataExist = () => {
+    axios.get(`http://localhost:5001/healthtracker/${userdata._id}`)
+      .then(response => {
+        const healthTrackerExists = response.data !== null;
+
+        if (healthTrackerExists) {
+          const data = response.data
+          console.log(data);
+          setCalculatedCalories(data.calculated_calories)
+          setCurrentWeight(data.current_weight)
+          setCurrentHeight(data.current_height)
+          setBmiResult(data.bmi_result)
+          setGender(data.gender)
+          setOverallProgress(data.overall_progression)
+          setSelectedTrackingType(data.tracking_type)
+          setSelectedTargetedWeight(data.targeted_weight)
+          const weigDiff = parseFloat(data.current_weight) - parseFloat(data.targeted_weight)
+          const currentDate = new Date();
+          const formattedDate = currentDate.toISOString().split('T')[0];
+          const todayDailyProgression = data.daily_progression.find(entry => {
+            const entryDate = new Date(entry.date).toISOString().split('T')[0]; // Extract date part from the entry
+
+            return entryDate === formattedDate;
+          });
+          setDailyProgress(todayDailyProgression.progression)
+          setWeightDifference(weigDiff.toFixed(2))
+          setdataSet(true)
+        } else {
+          console.log('HealthTracker does not exist for the user.');
+        }
+      })
+      .catch(error => {
+        console.error('Error checking HealthTracker existence:', error);
+      });
+  }
+  useEffect(() => {
+    getTrackerDataExist();
+  }, [])
+
+
 
   return (
     <SafeAreaView style={styles.container}>
-      {!selectedTrackingType && (
+      {!dataSet && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => setShowModal(true)} style={styles.setTargetButton}>
             <Text style={styles.buttonText}>Set Health Target</Text>
@@ -69,7 +155,7 @@ const HealthTrackScreen = () => {
       <Modal visible={showModal} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic' }}>Set Health Target</Text>
+            <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic', paddingBottom: 15 }}>Set Health Target</Text>
             <View style={styles.inputBox}>
               <TextInput
                 placeholder="Current Weight (kg)"
@@ -94,6 +180,9 @@ const HealthTrackScreen = () => {
                 keyboardType="numeric"
               />
             </View>
+
+            <DropdownComponent onActivityChange={handelActivityChange} />
+            <GenderDropdown onGenderChange={handleGenderChange} />
             <View style={styles.inputBox}>
               <TextInput
                 placeholder="Age"
@@ -109,29 +198,41 @@ const HealthTrackScreen = () => {
         </View>
       </Modal>
 
-      {selectedTrackingType && (
+      {dataSet && (
         <View>
           {/* Display the selected target information and results */}
-          <View style={styles.trackerRow}>
-            <View style={styles.trackerBox}>
-              <Text style={styles.fieldText}>Selected Tracking Type: {selectedTrackingType}</Text>
+
+          <View style={{padding:6,backgroundColor:'#eeeee4',margin:3,borderRadius:15}}>
+            <View style={styles.trackerRow}>
+              <View style={styles.trackerBox}>
+                <Text style={styles.fieldText}>Selected Tracking Type: {selectedTrackingType}</Text>
+              </View>
+
+              <View style={styles.trackerBox}>
+                <Text style={styles.fieldText}>Targeted Weight: {selectedTargetedWeight} kg</Text>
+              </View>
             </View>
 
-            <View style={styles.trackerBox}>
-              <Text style={styles.fieldText}>Targeted Weight: {selectedTargetedWeight} kg</Text>
+            <View style={styles.trackerRow}>
+              <View style={styles.trackerBox}>
+                <Text style={styles.fieldText}>Weight Difference: {weightDifference} kg</Text>
+              </View>
+
+              <View style={styles.trackerBox}>
+                <Text style={styles.fieldText}>BMI Result: {bmiResult}</Text>
+              </View>
+            </View>
+
+            <View style={styles.trackerRow}>
+              <View style={styles.trackerBox}>
+                <Text style={styles.fieldText}>Gender: {Gender.toLocaleUpperCase()}</Text>
+              </View>
+
+              <View style={styles.trackerBox}>
+                <Text style={styles.fieldText}>Daily targeted Calories: {CalculatedCalories}</Text>
+              </View>
             </View>
           </View>
-
-          <View style={styles.trackerRow}>
-            <View style={styles.trackerBox}>
-              <Text style={styles.fieldText}>Weight Difference: {weightDifference} kg</Text>
-            </View>
-
-            <View style={styles.trackerBox}>
-              <Text style={styles.fieldText}>BMI Result: {bmiResult}</Text>
-            </View>
-          </View>
-
 
           {/* Progress bars */}
           <View style={styles.progressContainer}>
@@ -193,6 +294,35 @@ const HealthTrackScreen = () => {
             />
 
           </View>
+          {/* Button to update current weight */}
+          {selectedTrackingType && (
+            <View style={{ alignItems: 'center' }} >
+              <TouchableOpacity onPress={() => setShowUpdateWeightModal(true)} style={[styles.setTargetButton, { width: '90%' }]}>
+                <Text style={styles.buttonText}>Update Current Weight</Text>
+              </TouchableOpacity>
+            </View>
+
+          )}
+
+          {/* Update Weight Modal */}
+          <Modal visible={showUpdateWeightModal} transparent={true} animationType="slide">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic' }}>Update Current Weight</Text>
+                <View style={styles.inputBox}>
+                  <TextInput
+                    placeholder="Current Weight (kg)"
+                    value={updatedCurrentWeight}
+                    onChangeText={text => setUpdatedCurrentWeight(text)}
+                    keyboardType="numeric"
+                  />
+                </View>
+                <View style={{ backgroundColor: 'rgba(255, 199, 0, 0.97)', borderRadius: 14, }}>
+                  <Button title="Update Weight" color='white' onPress={handleUpdateWeight} />
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )}
     </SafeAreaView>
@@ -211,7 +341,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 20,
-    width: '75%'
+    width: '75%',
   },
   buttonText: {
     color: 'white',
@@ -223,6 +353,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     padding: 10,
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
 
   },
   modalContainer: {
@@ -237,7 +372,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 5,
     width: '90%',
-    textAlign: 'center'
+    textAlign: 'center',
+    // padding:5
   },
   progressContainer: {
     marginTop: 20,

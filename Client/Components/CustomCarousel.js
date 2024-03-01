@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, ScrollView, Dimensions, StyleSheet, Image } from 'react-native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
 const { width, height } = Dimensions.get("window");
 const CustomCarousel = ({ data }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -29,11 +31,6 @@ const CustomCarousel = ({ data }) => {
         {data.map((item, index) => (
           <View key={index} style={styles.carouselItem}>
             <Image style={styles.carouselImage} source={item.image} />
-            {/* <View style={styles.carouselTextContainer}>
-              <Text style={styles.carouselName}>{item.name}</Text>
-              <Text style={styles.carouselLocation}>{item.location}</Text>
-              <Text style={styles.carouselRating}>{`Rating: ${item.rating}`}</Text>
-            </View> */}
           </View>
         ))}
       </ScrollView>
@@ -63,8 +60,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   carouselImage: {
-    width: '100%',
-    height: 200,
+    width: wp('100%'),
+    height: hp('25%'),
     resizeMode: 'cover',
   },
   carouselTextContainer: {

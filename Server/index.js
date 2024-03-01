@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const { Restaurant } = require('./model/RestaurantModel');
+const HealthTracker = require('./model/healthTrackerSchema');
 
 
 dotenv.config();
@@ -221,7 +222,7 @@ app.post('/restaurants/:restaurantId/reviews', async (req, res) => {
         }
 
         // Create a new review
-        const newReview = { comment,rating: ratings };
+        const newReview = { comment, rating: ratings };
 
         // Add the review to the restaurant's reviews array
         restaurant.reviews.push(newReview);
@@ -236,6 +237,39 @@ app.post('/restaurants/:restaurantId/reviews', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Endpoint for handling health tracker data
+app.post('/healthtracker', (req, res) => {
+    const healthTrackerData = req.body;
+
+    // Create a new HealthTracker document
+    const healthTracker = new HealthTracker(healthTrackerData);
+
+    healthTracker.save()
+        .then(savedData => {
+            res.status(201).json(savedData);
+        })
+        .catch(error => {
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+
+// Endpoint for checking if HealthTracker exists for a user
+app.get('/healthtracker/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    // Check if HealthTracker document exists for the given user ID
+    HealthTracker.findOne({ user_id: userId })
+        .then(healthTracker => {
+            res.json(healthTracker); // Returns the found HealthTracker document or null if not found
+        })
+        .catch(error => {
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+
 // Port Initilization
 
 app.listen(5001, () => {

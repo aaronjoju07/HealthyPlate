@@ -5949,6 +5949,13 @@ react-native-chart-kit@^6.12.0:
     paths-js "^0.4.10"
     point-in-polygon "^1.0.1"
 
+react-native-element-dropdown@^2.10.1:
+  version "2.10.1"
+  resolved "https://registry.npmjs.org/react-native-element-dropdown/-/react-native-element-dropdown-2.10.1.tgz"
+  integrity sha512-7J3K6T1LZo5H2rsEdAPpYDwhgog4UvatFq8bsW3dCrd2oyXiftn83gcQP1NKRYl4QMyb4WCMXIf+FqmZzS4o/Q==
+  dependencies:
+    lodash "^4.17.21"
+
 react-native-feather@^1.1.2:
   version "1.1.2"
   resolved "https://registry.npmjs.org/react-native-feather/-/react-native-feather-1.1.2.tgz"
