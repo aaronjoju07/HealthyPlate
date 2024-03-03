@@ -1,7 +1,9 @@
+import { useStripe } from '@stripe/stripe-react-native';
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
+import axios from 'axios'
 
 const CartScreen = () => {
   const cartItems = useSelector((state) => state.cart.items);
@@ -9,10 +11,35 @@ const CartScreen = () => {
   // Calculate the total sum of the product of price and quantity
   const totalSum = cartItems.reduce((sum, item) => sum + item.dish.price * item.quantity, 0);
   const roundedTotal = totalSum.toFixed(2);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const handlePlaceOrder = async () => {
+    // 1. Create a payment intent
+    const response = await axios.post('http://localhost:5001/payment/intent', {
+      amount: 1000, // Replace with the actual amount
+    });
+    console.log(response);
+    if (response.error) {
+      Alert.alert('Something went wrong', response.error);
+      return;
+    }
+    // 2. Initialize the Payment sheet
+    const { error: paymentSheetError } = await initPaymentSheet({
+      merchantDisplayName: 'Example, Inc.',
+      paymentIntentClientSecret: response.data.paymentIntent,
+      defaultBillingDetails: {
+        name: 'Jane Doe',
+      },
+    });
+    if (paymentSheetError) {
+      Alert.alert('Something went wrong', paymentSheetError.message);
+      return;
+    }
+    const { error: paymentError } = await presentPaymentSheet();
 
-  const handlePlaceOrder = () => {
-    // Implement logic to place the order
-    // For example, you can navigate to a checkout screen
+    if (paymentError) {
+      Alert.alert(`Error code: ${paymentError.code}`, paymentError.message);
+      return;
+    }
     console.log('Placing Order...');
   };
 

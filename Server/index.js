@@ -14,6 +14,8 @@ dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const mongoUrl = process.env.MONGO_URL;
+const strpie_secret_key = process.env.STRIPE_SECRET_KEY;
+const stripe = require('stripe')(strpie_secret_key);
 
 mongoose.connect(mongoUrl).then(() => {
     console.log("MongoDB Connected");
@@ -269,6 +271,26 @@ app.get('/healthtracker/:userId', (req, res) => {
         });
 });
 
+
+// Stripe Payment Intent endpoint
+
+app.post('/payment/intent', async (req, res) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: req.body.amount,
+      currency: 'usd',
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
+    res.json({ paymentIntent: paymentIntent.client_secret });
+  } catch (e) {
+    res.status(400).json({
+      error: e.message,
+    });
+  }
+});
 
 // Port Initilization
 
