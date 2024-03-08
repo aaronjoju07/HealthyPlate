@@ -273,12 +273,23 @@ app.get('/healthtracker/:userId', (req, res) => {
 
 
 // Stripe Payment Intent endpoint
-
+// Card No : 4000003560000008
 app.post('/payment/intent', async (req, res) => {
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: req.body.amount,
-      currency: 'usd',
+      currency: 'inr',
+      description: "some description",
+      shipping: {
+              name: 'Jenny Rosen',
+              address: {
+                line1: '510 Townsend St',
+                postal_code: '98140',
+                city: 'San Francisco',
+                state: 'CA',
+                country: 'US',
+              },
+            },      
       automatic_payment_methods: {
         enabled: true,
       },

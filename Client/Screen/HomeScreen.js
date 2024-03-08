@@ -15,8 +15,8 @@ import { getUser, setUser } from '../reducer/User/userSlice';
 
 // carousel for restaurant 
 const carouselData = [
-  { image: require('../assets/images/carousel1.jpg') },
   { image: require('../assets/images/carousel3.png') },
+  { image: require('../assets/images/carousel1.jpg') },
 ];
 const { width, height } = Dimensions.get("window");
 

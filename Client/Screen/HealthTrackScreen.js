@@ -18,8 +18,8 @@ const HealthTrackScreen = () => {
   const [targetedWeight, setTargetedWeight] = useState('');
   const [currentHeight, setCurrentHeight] = useState('');
   const [age, setAge] = useState('');
-  const [dailyProgress, setDailyProgress] = useState(60);
-  const [overallProgress, setOverallProgress] = useState(40);
+  const [dailyProgress, setDailyProgress] = useState(0);
+  const [overallProgress, setOverallProgress] = useState(0);
 
   const [dataSet, setdataSet] = useState(false)
   const [selectedTrackingType, setSelectedTrackingType] = useState('');
@@ -77,9 +77,8 @@ const HealthTrackScreen = () => {
         }
       ],
     };
-    axios.post(`http://localhost:5001/healthtracker`, healthTrackerData)
+    axios.post(`${process.env.URL}/healthtracker`, healthTrackerData)
       .then(response => {
-        console.log('Data posted successfully:', response.data);
         setdataSet(true)
       })
       .catch(error => {
@@ -101,32 +100,39 @@ const HealthTrackScreen = () => {
   const handleGenderChange = (gender) => { setGender(gender) }
   const handelActivityChange = (activity) => { setactivityFactor(activity) }
   const getTrackerDataExist = () => {
-    axios.get(`http://localhost:5001/healthtracker/${userdata._id}`)
+    axios.get(`${process.env.URL}/healthtracker/${userdata._id}`)
       .then(response => {
         const healthTrackerExists = response.data !== null;
 
         if (healthTrackerExists) {
-          const data = response.data
-          console.log(data);
-          setCalculatedCalories(data.calculated_calories)
-          setCurrentWeight(data.current_weight)
-          setCurrentHeight(data.current_height)
-          setBmiResult(data.bmi_result)
-          setGender(data.gender)
-          setOverallProgress(data.overall_progression)
-          setSelectedTrackingType(data.tracking_type)
-          setSelectedTargetedWeight(data.targeted_weight)
-          const weigDiff = parseFloat(data.current_weight) - parseFloat(data.targeted_weight)
-          const currentDate = new Date();
-          const formattedDate = currentDate.toISOString().split('T')[0];
-          const todayDailyProgression = data.daily_progression.find(entry => {
-            const entryDate = new Date(entry.date).toISOString().split('T')[0]; // Extract date part from the entry
+          const data = response.data;
+          // console.log(data);
 
-            return entryDate === formattedDate;
-          });
-          setDailyProgress(todayDailyProgression.progression)
-          setWeightDifference(weigDiff.toFixed(2))
-          setdataSet(true)
+          if (data.daily_progression && data.daily_progression.length > 0) {
+            const currentDate = new Date();
+            const formattedDate = currentDate.toISOString().split('T')[0];
+            const todayDailyProgression = data.daily_progression.find(entry => {
+              const entryDate = new Date(entry.date).toISOString().split('T')[0];
+
+              return entryDate === formattedDate;
+            });
+
+            setDailyProgress(todayDailyProgression ? todayDailyProgression.progression : 0);
+          }
+
+          setCalculatedCalories(data.calculated_calories);
+          setCurrentWeight(data.current_weight);
+          setCurrentHeight(data.current_height);
+          setBmiResult(data.bmi_result);
+          setGender(data.gender);
+          setOverallProgress(data.overall_progression);
+          setSelectedTrackingType(data.tracking_type);
+          setSelectedTargetedWeight(data.targeted_weight);
+
+          const weigDiff = parseFloat(data.current_weight) - parseFloat(data.targeted_weight);
+          setWeightDifference(weigDiff.toFixed(2));
+
+          setdataSet(true);
         } else {
           console.log('HealthTracker does not exist for the user.');
         }
@@ -134,7 +140,8 @@ const HealthTrackScreen = () => {
       .catch(error => {
         console.error('Error checking HealthTracker existence:', error);
       });
-  }
+  };
+
   useEffect(() => {
     getTrackerDataExist();
   }, [])
@@ -202,7 +209,7 @@ const HealthTrackScreen = () => {
         <View>
           {/* Display the selected target information and results */}
 
-          <View style={{padding:6,backgroundColor:'#eeeee4',margin:3,borderRadius:15}}>
+          <View style={{ padding: 6, backgroundColor: '#eeeee4', margin: 3, borderRadius: 15 }}>
             <View style={styles.trackerRow}>
               <View style={styles.trackerBox}>
                 <Text style={styles.fieldText}>Selected Tracking Type: {selectedTrackingType}</Text>

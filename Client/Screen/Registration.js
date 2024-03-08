@@ -53,7 +53,7 @@ const Registration = () => {
       username: name, email: email, phnum: phoneNumber, password: password
     }
     if (nameValid && emailValid && phoneValid && passwordValid && name.length > 0 && password.length > 0 && phoneNumber.length > 0 && email.length > 0) {
-      axios.post('http://localhost:5001/register',user).then((res)=>{
+      axios.post(`${process.env.URL}/register`,user).then((res)=>{
         if (res.data.status == 'ok') {
           Alert.alert(res.data.data)
           navigation.navigate('Login')

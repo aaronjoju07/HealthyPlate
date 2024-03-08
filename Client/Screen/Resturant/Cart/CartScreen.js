@@ -24,7 +24,7 @@ const CartScreen = () => {
     }
     // 2. Initialize the Payment sheet
     const { error: paymentSheetError } = await initPaymentSheet({
-      merchantDisplayName: 'Example, Inc.',
+      merchantDisplayName: 'HealtthyPlate, Inc.',
       paymentIntentClientSecret: response.data.paymentIntent,
       defaultBillingDetails: {
         name: 'Jane Doe',

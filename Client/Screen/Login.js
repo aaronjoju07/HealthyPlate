@@ -18,18 +18,21 @@ const Login = () => {
     if (email.length == 0 && password.length == 0) {
       Alert.alert('Input email and password')
     } else {
-      axios.post('http://localhost:5001/login', userData).then((res) => {
-        // console.log(res.data)
-        if (res.data.status == 'ok') {
-          AsyncStorage.setItem("token",res.data.data)
-          AsyncStorage.setItem("isLogin",JSON.stringify(true))
-          // Alert.alert('Login Successfull')
-          setTimeout(() => {
-            Alert.alert('Success', 'Login successful!');
-          }, 500);
-          navigation.navigate('TabNavigation');
-        }
-      })
+      axios.post('http://0.0.0.0:5001/login', userData)
+        .then((res) => {
+          if (res.data.status === 'ok') {
+            AsyncStorage.setItem("token", res.data.data);
+            AsyncStorage.setItem("isLogin", JSON.stringify(true));
+            setTimeout(() => {
+              Alert.alert('Success', 'Login successful!');
+            }, 500);
+            navigation.navigate('TabNavigation');
+          }
+        })
+        .catch((error) => {
+          console.error('Axios Error:', error);
+          Alert.alert('Error', 'There was an issue with the network. Please try again.');
+        });
     }
   }
   let [fontsLoaded, fontError] = useFonts({
@@ -52,8 +55,8 @@ const Login = () => {
       </View>
 
       <View style={styles.textInputContainer}>
-        <TextInput style={styles.input} autoCapitalize="none"  onChangeText={(text) => setEmail(text)} value={email} placeholder="Email" />
-        <TextInput style={styles.input} autoCapitalize="none"  placeholder="Password" value={password} onChangeText={(text) => setPassword(text)} secureTextEntry={true} />
+        <TextInput style={styles.input} autoCapitalize="none" onChangeText={(text) => setEmail(text)} value={email} placeholder="Email" />
+        <TextInput style={styles.input} autoCapitalize="none" placeholder="Password" value={password} onChangeText={(text) => setPassword(text)} secureTextEntry={true} />
       </View>
 
       <TouchableOpacity style={styles.loginButton} onPress={() => pressLogin()}>
