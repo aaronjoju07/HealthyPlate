@@ -275,32 +275,123 @@ app.get('/healthtracker/:userId', (req, res) => {
 // Stripe Payment Intent endpoint
 // Card No : 4000003560000008
 app.post('/payment/intent', async (req, res) => {
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: req.body.amount,
-      currency: 'inr',
-      description: "some description",
-      shipping: {
-              name: 'Jenny Rosen',
-              address: {
-                line1: '510 Townsend St',
-                postal_code: '98140',
-                city: 'San Francisco',
-                state: 'CA',
-                country: 'US',
-              },
-            },      
-      automatic_payment_methods: {
-        enabled: true,
-      },
-    });
+    try {
+        const amountInPaise = Math.round(req.body.amount * 100); // Convert to paise
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amountInPaise,
+            currency: 'inr',
+            description: 'some description',
+            shipping: {
+                name: 'Jenny Rosen',
+                address: {
+                    line1: '510 Townsend St',
+                    postal_code: '98140',
+                    city: 'San Francisco',
+                    state: 'CA',
+                    country: 'US',
+                },
+            },
+            automatic_payment_methods: {
+                enabled: true,
+            },
+        });
 
-    res.json({ paymentIntent: paymentIntent.client_secret });
-  } catch (e) {
-    res.status(400).json({
-      error: e.message,
-    });
-  }
+        res.json({ paymentIntent: paymentIntent.client_secret });
+    } catch (e) {
+        console.error('Error creating payment intent:', e);
+        res.status(400).json({
+            error: e.message,
+        });
+    }
+
+});
+
+
+// Add this route to your existing Express app
+app.post('/updateWeight', async (req, res) => {
+    const { user_id, updated_weight } = req.body;
+
+    try {
+        const healthTracker = await HealthTracker.findOne({ user_id });
+
+        if (!healthTracker) {
+            return res.status(404).json({ error: 'HealthTracker not found for the user' });
+        }
+
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().split('T')[0];
+
+        healthTracker.weight_history.push({
+            date: formattedDate,
+            weight: updated_weight,
+        });
+
+        await healthTracker.save();
+
+        res.status(200).json({ status: 'OK', message: 'Weight updated successfully' });
+    } catch (error) {
+        console.error('Error updating weight:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// get weight history for a user
+app.get('/healthtracker/:userId/weighthistory', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const healthTracker = await HealthTracker.findOne({ user_id: userId });
+
+        if (!healthTracker) {
+            return res.status(404).json({ error: 'HealthTracker not found for the user' });
+        }
+
+        const weightHistory = healthTracker.weight_history;
+
+        res.status(200).json({ status: 'OK', data: weightHistory });
+    } catch (error) {
+        console.error('Error fetching weight history:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// grt overall progression for a user
+app.get('/healthtracker/:userId/overallprogression', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const healthTracker = await HealthTracker.findOne({ user_id: userId });
+
+        if (!healthTracker) {
+            return res.status(404).json({ error: 'HealthTracker not found for the user' });
+        }
+
+        const overallProgression = healthTracker.overall_progression;
+
+        res.status(200).json({ status: 'OK', data: overallProgression });
+    } catch (error) {
+        console.error('Error fetching overall progression:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// getting daily progression data
+app.get('/healthtracker/:userId/dailyprogression', (req, res) => {
+    const userId = req.params.userId;
+
+    // Check if HealthTracker document exists for the given user ID
+    HealthTracker.findOne({ user_id: userId })
+        .then(healthTracker => {
+            if (healthTracker && healthTracker.daily_progression) {
+                const dailyProgression = healthTracker.daily_progression;
+                res.json({ status: 'OK', count: dailyProgression.length, data: dailyProgression });
+            } else {
+                res.status(404).json({ error: 'Daily progression data not found for the user' });
+            }
+        })
+        .catch(error => {
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
 });
 
 // Port Initilization

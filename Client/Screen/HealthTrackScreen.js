@@ -30,6 +30,48 @@ const HealthTrackScreen = () => {
   const [Gender, setGender] = useState('')
   const [CalculatedCalories, setCalculatedCalories] = useState(0)
 
+
+  const [weightHistory, setWeightHistory] = useState([]);
+
+  const getWeightHistory = () => {
+    axios.get(`${process.env.URL}/healthtracker/${userdata._id}/weighthistory`)
+      .then(response => {
+        const weightHistory = response.data.data;
+        setWeightHistory(weightHistory);
+      })
+      .catch(error => {
+        console.error('Error fetching weight history:', error);
+      });
+  };
+
+  const getOverallProgression = () => {
+    axios.get(`${process.env.URL}/healthtracker/${userdata._id}/overallprogression`)
+      .then(response => {
+        const overallProgression = response.data.data;
+        // console.log('Overall Progression:', overallProgression);
+      })
+      .catch(error => {
+        console.error('Error fetching overall progression:', error);
+      });
+  };
+
+  const getDailyProgression = () => {
+    axios.get(`${process.env.URL}/healthtracker/${userdata._id}`)
+      .then(response => {
+        const healthTrackerData = response.data;
+
+        if (healthTrackerData && healthTrackerData.daily_progression) {
+          const dailyProgression = healthTrackerData.daily_progression;
+          // console.log('Daily Progression:', dailyProgression);
+        } else {
+          console.log('No daily progression data available.');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching daily progression:', error);
+      });
+  };
+
   const handleSetTarget = () => {
     if (
       currentWeight.trim() === '' ||
@@ -89,14 +131,40 @@ const HealthTrackScreen = () => {
 
   const [showUpdateWeightModal, setShowUpdateWeightModal] = useState(false);
 
-  // New state variable for updated current weight
   const [updatedCurrentWeight, setUpdatedCurrentWeight] = useState('');
 
-  // Function to handle updating current weight and adding data to chart
   const handleUpdateWeight = () => {
 
+    const updatedWeightValue = parseFloat(updatedCurrentWeight);
+
+    if (isNaN(updatedWeightValue) || updatedWeightValue <= 0 || updatedWeightValue <= currentWeight) {
+      alert('Please enter a valid and non-negative weight greater than the current weight.');
+      return;
+    }
+
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    const formattedTime = currentDate.toLocaleTimeString('en-US', { hour12: false });
+    const dateTime = `${formattedDate} ${formattedTime}`;
+
+    const updateWeightData = {
+      user_id: userdata._id,
+      updated_weight: updatedWeightValue,
+      update_date: dateTime,
+    };
+
+    axios.post(`${process.env.URL}/updateWeight`, updateWeightData)
+      .then(response => {
+        console.log('Weight updated successfully:', response.data);
+        getWeightHistory();
+      })
+      .catch(error => {
+        console.error('Error updating weight:', error);
+      });
+      
     setShowUpdateWeightModal(false);
   };
+
   const handleGenderChange = (gender) => { setGender(gender) }
   const handelActivityChange = (activity) => { setactivityFactor(activity) }
   const getTrackerDataExist = () => {
@@ -122,10 +190,19 @@ const HealthTrackScreen = () => {
 
           setCalculatedCalories(data.calculated_calories);
           setCurrentWeight(data.current_weight);
+          // Update CurrentWeight based on the last entry in weight history
+          if (data.weight_history && data.weight_history.length > 0) {
+            const lastWeightEntry = data.weight_history[data.weight_history.length - 1];
+            setCurrentWeight(lastWeightEntry.weight);
+          }
           setCurrentHeight(data.current_height);
           setBmiResult(data.bmi_result);
           setGender(data.gender);
-          setOverallProgress(data.overall_progression);
+
+          // Calculate and set overallProgress
+          const calculatedOverallProgress = (parseFloat(currentWeight) / parseFloat(data.targeted_weight)) * 100;
+          setOverallProgress(calculatedOverallProgress.toFixed(2));
+
           setSelectedTrackingType(data.tracking_type);
           setSelectedTargetedWeight(data.targeted_weight);
 
@@ -144,6 +221,9 @@ const HealthTrackScreen = () => {
 
   useEffect(() => {
     getTrackerDataExist();
+    getWeightHistory();
+    getOverallProgression();
+    getDailyProgression();
   }, [])
 
 
@@ -259,30 +339,28 @@ const HealthTrackScreen = () => {
             <Text style={styles.chartTitle}>Weight Progression Chart</Text>
             <LineChart
               data={{
-                labels: ["January", "February", "March", "April", "May", "June"],
+                labels: weightHistory.map(entry => {
+                  const dateObject = new Date(entry.date);
+                  const formattedDate = `${dateObject.getDate()}/${dateObject.getMonth() + 1}/${dateObject.getFullYear()}`;
+                  return formattedDate;
+                })
+                ,
                 datasets: [
                   {
-                    data: [
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100
-                    ]
+                    data: weightHistory.map(entry => parseFloat(entry.weight))
                   }
                 ]
               }}
-              width={Dimensions.get("window").width - 5} // from react-native
+              width={Dimensions.get("window").width - 5}
               height={220}
               yAxisLabel="kg"
-              yAxisInterval={1} // optional, defaults to 1
+              yAxisInterval={1}
               chartConfig={{
                 backgroundColor: 'rgba(255, 199, 7, 6)',
                 backgroundGradientFrom: 'rgba(255, 131, 0, 0.1)',
                 backgroundGradientTo: 'rgba(255, 189, 0, 0.1)',
-                decimalPlaces: 1, // optional, defaults to 2dp
-                color: (opacity = 1) => `rgba(255, 199, 0, ${opacity})`, // Set the color to rgba(255, 199, 0, 1)
+                decimalPlaces: 1,
+                color: (opacity = 1) => `rgba(255, 199, 0, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 style: {
                   borderRadius: 14,
@@ -299,7 +377,6 @@ const HealthTrackScreen = () => {
                 borderRadius: 16
               }}
             />
-
           </View>
           {/* Button to update current weight */}
           {selectedTrackingType && (

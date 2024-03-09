@@ -15,9 +15,9 @@ const CartScreen = () => {
   const handlePlaceOrder = async () => {
     // 1. Create a payment intent
     const response = await axios.post('http://localhost:5001/payment/intent', {
-      amount: 1000, // Replace with the actual amount
+      amount: totalSum, 
     });
-    console.log(response);
+    // console.log(response);
     if (response.error) {
       Alert.alert('Something went wrong', response.error);
       return;
@@ -57,7 +57,7 @@ const CartScreen = () => {
         )}
       />
       <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Total: ${roundedTotal}</Text>
+        <Text style={styles.totalText}>Total: ₹{roundedTotal}</Text>
       </View>
       <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
         <Text style={styles.placeOrderButtonText}>Place Order</Text>
