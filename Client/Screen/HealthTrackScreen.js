@@ -8,6 +8,7 @@ import GenderDropdown from '../Components/GenderDropdown';
 import calculateCalories from '../Service/calculateCalories';
 import { useSelector } from 'react-redux';
 import axios from 'axios'
+import { useNavigation } from '@react-navigation/native';
 
 const HealthTrackScreen = () => {
 
@@ -226,8 +227,27 @@ const HealthTrackScreen = () => {
     getDailyProgression();
   }, [])
 
+const navigation = useNavigation();
+ // Step 1: Add state for food details modal
+ const [showFoodModal, setShowFoodModal] = useState(false);
+ const [foodDetails, setFoodDetails] = useState('');
 
+ // Step 2: Add function to handle opening food details modal
+ const handleOpenFoodModal = () => {
+   setShowFoodModal(true);
+ };
 
+ // Step 3: Add function to handle saving food details and redirecting
+ const handleSaveFoodDetails = () => {
+   // Save food details (for example, you can update the state or send to backend)
+   // ...
+
+   // Redirect to DailyFoodTracker page
+   navigation.navigate('DailyFoodTracker', { foodList: ["Poha", "Tomato", "Milk"] });
+   
+   // Close the food details modal
+   setShowFoodModal(false);
+ };
   return (
     <SafeAreaView style={styles.container}>
       {!dataSet && (
@@ -403,6 +423,31 @@ const HealthTrackScreen = () => {
                 </View>
                 <View style={{ backgroundColor: 'rgba(255, 199, 0, 0.97)', borderRadius: 14, }}>
                   <Button title="Update Weight" color='white' onPress={handleUpdateWeight} />
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+
+          {/* Add button */}
+          <TouchableOpacity onPress={handleOpenFoodModal} style={[styles.setTargetButton, { width: '90%' }]}>
+            <Text style={styles.buttonText}>Enter Food Details</Text>
+          </TouchableOpacity>
+
+          {/* Food Details Modal */}
+          <Modal visible={showFoodModal} transparent={true} animationType="slide">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic' }}>Enter Food Details</Text>
+                <TextInput
+                  placeholder="Enter food details"
+                  value={foodDetails}
+                  onChangeText={text => setFoodDetails(text)}
+                  multiline
+                  style={{ height: 100, borderColor: 'gray', borderWidth: 0.5, borderRadius: 8, marginTop: 10, paddingHorizontal: 8 }}
+                />
+                <View style={{ marginTop: 10, backgroundColor: 'rgba(255, 199, 0, 0.97)', borderRadius: 14 }}>
+                  <Button title="Save and Close" color='white' onPress={handleSaveFoodDetails} />
                 </View>
               </View>
             </View>

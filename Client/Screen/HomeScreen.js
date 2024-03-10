@@ -50,6 +50,9 @@ const HomeScreen = () => {
   const goToResturant = (restaurant) => {
     navigation.navigate('RestaurantScreen', { restaurant });
   }
+  const recommendNav = () =>{
+    navigation.navigate('DailyFoodTracker')
+  }
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style='rgba(255, 199, 0, 0.25' />
@@ -73,6 +76,11 @@ const HomeScreen = () => {
 
 
         <View style={styles.lineChartContainer}>
+        <TouchableOpacity onPress={()=>recommendNav()}>
+            <Text>
+              CLICK TO RECOMMEND
+            </Text>
+          </TouchableOpacity>
           <View style={{ flex: 1, flexDirection: 'row', width: width }}>
             <WorkoutTracker />
             <WorkoutTracker />
