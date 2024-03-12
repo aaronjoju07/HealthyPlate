@@ -23,9 +23,9 @@ const Login = () => {
           if (res.data.status === 'ok') {
             AsyncStorage.setItem("token", res.data.data);
             AsyncStorage.setItem("isLogin", JSON.stringify(true));
-            setTimeout(() => {
-              Alert.alert('Success', 'Login successful!');
-            }, 500);
+            // setTimeout(() => {
+            //   Alert.alert('Success', 'Login successful!');
+            // }, 500);
             navigation.navigate('TabNavigation');
           }
         })

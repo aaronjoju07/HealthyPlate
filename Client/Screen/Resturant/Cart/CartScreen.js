@@ -15,32 +15,44 @@ const CartScreen = () => {
   const handlePlaceOrder = async () => {
     // 1. Create a payment intent
     const response = await axios.post('http://localhost:5001/payment/intent', {
-      amount: totalSum, 
+      amount: totalSum,
     });
-    // console.log(response);
+  
     if (response.error) {
       Alert.alert('Something went wrong', response.error);
       return;
     }
+  
     // 2. Initialize the Payment sheet
     const { error: paymentSheetError } = await initPaymentSheet({
-      merchantDisplayName: 'HealtthyPlate, Inc.',
+      merchantDisplayName: 'HealthyPlate, Inc.',
       paymentIntentClientSecret: response.data.paymentIntent,
       defaultBillingDetails: {
         name: 'Jane Doe',
       },
     });
+  
     if (paymentSheetError) {
       Alert.alert('Something went wrong', paymentSheetError.message);
       return;
     }
+  
     const { error: paymentError } = await presentPaymentSheet();
-
+  
     if (paymentError) {
       Alert.alert(`Error code: ${paymentError.code}`, paymentError.message);
       return;
     }
-    console.log('Placing Order...');
+  
+    // Payment successful
+    Alert.alert('Payment successful', 'Order placed successfully', [
+      {
+        text: 'OK',
+        onPress: () => {
+          navigation.navigate('Home');
+        },
+      },
+    ]);
   };
 
   return (

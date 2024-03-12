@@ -88,11 +88,12 @@ const HealthTrackScreen = () => {
     const trackingType = calculateTrackingType(targetedWeight, currentWeight);
     setSelectedTrackingType(trackingType);
     setSelectedTargetedWeight(targetedWeight);
-    setWeightDifference(targetedWeight - currentWeight);
+    const abs = Math.abs(targetedWeight - currentWeight)
+    setWeightDifference(abs);
     const bmi = calculateBMI(currentWeight, currentHeight);
     setBmiResult(bmi);
     const calculatedCalories = calculateCalories(currentWeight, currentHeight, age, Gender, activityFactor, trackingType)
-    setCalculatedCalories(calculatedCalories)
+    setCalculatedCalories(Math.abs(calculatedCalories))
     // console.log(userdata);
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
@@ -138,7 +139,7 @@ const HealthTrackScreen = () => {
 
     const updatedWeightValue = parseFloat(updatedCurrentWeight);
 
-    if (isNaN(updatedWeightValue) || updatedWeightValue <= 0 || updatedWeightValue <= currentWeight) {
+    if (isNaN(updatedWeightValue) || updatedWeightValue <= 0) {
       alert('Please enter a valid and non-negative weight greater than the current weight.');
       return;
     }
@@ -162,7 +163,7 @@ const HealthTrackScreen = () => {
       .catch(error => {
         console.error('Error updating weight:', error);
       });
-      
+
     setShowUpdateWeightModal(false);
   };
 
@@ -189,7 +190,7 @@ const HealthTrackScreen = () => {
             setDailyProgress(todayDailyProgression ? todayDailyProgression.progression : 0);
           }
 
-          setCalculatedCalories(data.calculated_calories);
+          setCalculatedCalories(Math.abs(data.calculated_calories));
           setCurrentWeight(data.current_weight);
           // Update CurrentWeight based on the last entry in weight history
           if (data.weight_history && data.weight_history.length > 0) {
@@ -208,7 +209,7 @@ const HealthTrackScreen = () => {
           setSelectedTargetedWeight(data.targeted_weight);
 
           const weigDiff = parseFloat(data.current_weight) - parseFloat(data.targeted_weight);
-          setWeightDifference(weigDiff.toFixed(2));
+          setWeightDifference(Math.abs(weigDiff.toFixed(2)));
 
           setdataSet(true);
         } else {
@@ -227,27 +228,27 @@ const HealthTrackScreen = () => {
     getDailyProgression();
   }, [])
 
-const navigation = useNavigation();
- // Step 1: Add state for food details modal
- const [showFoodModal, setShowFoodModal] = useState(false);
- const [foodDetails, setFoodDetails] = useState('');
+  const navigation = useNavigation();
+  // Step 1: Add state for food details modal
+  const [showFoodModal, setShowFoodModal] = useState(false);
+  const [foodDetails, setFoodDetails] = useState('');
 
- // Step 2: Add function to handle opening food details modal
- const handleOpenFoodModal = () => {
-   setShowFoodModal(true);
- };
+  // Step 2: Add function to handle opening food details modal
+  const handleOpenFoodModal = () => {
+    setShowFoodModal(true);
+  };
 
- // Step 3: Add function to handle saving food details and redirecting
- const handleSaveFoodDetails = () => {
-   // Save food details (for example, you can update the state or send to backend)
-   // ...
+  // Step 3: Add function to handle saving food details and redirecting
+  const handleSaveFoodDetails = () => {
+    // Save food details (for example, you can update the state or send to backend)
+    // ...
 
-   // Redirect to DailyFoodTracker page
-   navigation.navigate('DailyFoodTracker', { foodList: ["Poha", "Tomato", "Milk"] });
-   
-   // Close the food details modal
-   setShowFoodModal(false);
- };
+    // Redirect to DailyFoodTracker page
+    navigation.navigate('DailyFoodTracker', { foodList: ["Poha", "Tomato", "Milk"] });
+
+    // Close the food details modal
+    setShowFoodModal(false);
+  };
   return (
     <SafeAreaView style={styles.container}>
       {!dataSet && (
@@ -361,7 +362,7 @@ const navigation = useNavigation();
               data={{
                 labels: weightHistory.map(entry => {
                   const dateObject = new Date(entry.date);
-                  const formattedDate = `${dateObject.getDate()}/${dateObject.getMonth() + 1}/${dateObject.getFullYear()}`;
+                  const formattedDate = `${dateObject.getDate()}/${dateObject.getMonth() + 1}`;
                   return formattedDate;
                 })
                 ,
@@ -399,14 +400,19 @@ const navigation = useNavigation();
             />
           </View>
           {/* Button to update current weight */}
-          {selectedTrackingType && (
+          {/* Update Weight Button or Success Message */}
+          {selectedTrackingType && weightHistory.length > 0 && (
             <View style={{ alignItems: 'center' }} >
-              <TouchableOpacity onPress={() => setShowUpdateWeightModal(true)} style={[styles.setTargetButton, { width: '90%' }]}>
-                <Text style={styles.buttonText}>Update Current Weight</Text>
-              </TouchableOpacity>
+              {parseFloat(weightHistory[weightHistory.length - 1].weight) === parseFloat(selectedTargetedWeight) ? (
+                <Text style={{ fontSize: 18, marginBottom: 10, fontStyle: 'italic', color: '#5f0f0a' }}>Congratulations! You've reached your targeted weight!</Text>
+              ) : (
+                <TouchableOpacity onPress={() => setShowUpdateWeightModal(true)} style={[styles.setTargetButton, { width: '90%' }]}>
+                  <Text style={styles.buttonText}>Update Current Weight</Text>
+                </TouchableOpacity>
+              )}
             </View>
-
           )}
+
 
           {/* Update Weight Modal */}
           <Modal visible={showUpdateWeightModal} transparent={true} animationType="slide">
@@ -430,9 +436,11 @@ const navigation = useNavigation();
 
 
           {/* Add button */}
-          <TouchableOpacity onPress={handleOpenFoodModal} style={[styles.setTargetButton, { width: '90%' }]}>
-            <Text style={styles.buttonText}>Enter Food Details</Text>
-          </TouchableOpacity>
+          <View style={{ alignItems: 'center' }} >
+            <TouchableOpacity onPress={handleOpenFoodModal} style={[styles.setTargetButton, { width: '90%' }]}>
+              <Text style={styles.buttonText}>Enter Food Details</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Food Details Modal */}
           <Modal visible={showFoodModal} transparent={true} animationType="slide">
@@ -440,7 +448,7 @@ const navigation = useNavigation();
               <View style={styles.modalContent}>
                 <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic' }}>Enter Food Details</Text>
                 <TextInput
-                  placeholder="Enter food details"
+                  placeholder='"Poha", "Tomato", "Milk" etc. (comma-separated)'
                   value={foodDetails}
                   onChangeText={text => setFoodDetails(text)}
                   multiline

@@ -26,7 +26,6 @@ const HomeScreen = () => {
   const [UserData, setUserData] = useState([])
   const dispatch = useDispatch()
   
-  
   const [Resturants, setResturants] = useState([])
   const getUserData = async () => {
     const token = await AsyncStorage.getItem('token')
@@ -76,14 +75,9 @@ const HomeScreen = () => {
 
 
         <View style={styles.lineChartContainer}>
-        <TouchableOpacity onPress={()=>recommendNav()}>
-            <Text>
-              CLICK TO RECOMMEND
-            </Text>
-          </TouchableOpacity>
           <View style={{ flex: 1, flexDirection: 'row', width: width }}>
             <WorkoutTracker />
-            <WorkoutTracker />
+            {/* <WorkoutTracker /> */}
           </View>
         </View>
       </ScrollView>

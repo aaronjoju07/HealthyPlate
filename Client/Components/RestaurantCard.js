@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   restaurantRating: {
     fontSize: 14,
-    color: '#f8d12c',
+    color: '#DAA520',
     marginRight: 5,
   },
 });

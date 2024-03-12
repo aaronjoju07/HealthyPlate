@@ -17,7 +17,6 @@ const MenuItem = ({ itemName, itemImage, dish }) => {
         setQuantity(quantity + 1);
         dispatch(addToCart({ dish, quantity: 1 }));
     };
-
     const decrementQuantity = () => {
         if (quantity > 0) {
             setQuantity(quantity - 1);
@@ -38,6 +37,7 @@ const MenuItem = ({ itemName, itemImage, dish }) => {
                 <Image source={{ uri: itemImage }} style={styles.menuItemImage} />
                 <View style={styles.itemDetails}>
                     <Text style={styles.itemName}>{itemName}</Text>
+                    <Text style={styles.itemAmount}>₹{dish.price}</Text>
                 </View>
             </TouchableOpacity>
             <View style={styles.quantityContainer}>
@@ -77,14 +77,8 @@ const RestaurantScreen = ({ route }) => {
     useEffect(() => {
         fetchReviews();
         const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-            // Prevent default behavior of leaving the screen
             e.preventDefault();
-
-            // Log the action
             dispatch(clearCart());
-            // console.log('User navigated back from RestaurantScreen');
-
-            // Continue with the navigation
             navigation.dispatch(e.data.action);
         });
     }, [])
@@ -316,8 +310,9 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         padding: 16,
-    }
-
+    }, itemAmount: {
+        color: '#888', // Adjust the color according to your design
+    },
 
 });
 

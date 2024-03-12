@@ -72,15 +72,15 @@ const SearchScreen = () => {
           }}
           value={searchQuery}
         />
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <View style={{ marginLeft: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <Text><Icon.MapPin height="25" width="25" stroke="rgba(255, 199, 0, 1)" /></Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Category Component */}
-      <View style={{ flex: 0.1, flexDirection: 'row', marginBottom: 10 }}>
+      {/* <View style={{ flex: 0.1, flexDirection: 'row', marginBottom: 10 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((category, index) => (
             <TouchableOpacity
@@ -99,7 +99,7 @@ const SearchScreen = () => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </View>
+      </View> */}
 
       {/* Restaurant Cards */}
       {searchQuery.length > 0 ?
