@@ -21,7 +21,7 @@ navigation.navigate('HealthTrack')
               <FontAwesomeIcon icon={faRunning} color='#fff' size={20} style={styles.runningIcon} />
             </View>
 
-            <Text style={styles.trackerValue}>Burn at least 454 Cal</Text>
+            <Text style={styles.trackerValue}>Eat mindfully</Text>
           </View>
         </View>
       </TouchableOpacity>

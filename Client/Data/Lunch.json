@@ -1,0 +1,102 @@
+[
+    {
+        "id": 2,
+        "name": "Kadhi"
+    },
+    {
+        "id": 12,
+        "name": "Bhel Puri"
+    },
+    {
+        "id": 15,
+        "name": "Paneer Tikka"
+    },
+    {
+        "id": 5,
+        "name": "Mango Chutney"
+    },
+    {
+        "id": 6,
+        "name": "Baati"
+    },
+    {
+        "id": 7,
+        "name": "Brown Rice"
+    },
+    {
+        "id": 8,
+        "name": "Cauliflower"
+    },
+    {
+        "id": 26,
+        "name": "Cheese Pizza"
+    },
+    {
+        "id": 27,
+        "name": "Onion Pakoda"
+    },
+    {
+        "id": 28,
+        "name": "Butter Chicken"
+    },
+    {
+        "id": 29,
+        "name": "Chicken Kolapuri"
+    },
+    {
+        "id": 30,
+        "name": "Gulab Jamun"
+    },
+    {
+        "id": 31,
+        "name": "Jalebi"
+    },
+    {
+        "id": 32,
+        "name": "Dairy Milk"
+    },
+    {
+        "id": 33,
+        "name": "Fruit and Nut chocolate"
+    },
+    {
+        "id": 37,
+        "name": "Uttapam"
+    },
+    {
+        "id": 38,
+        "name": "Bhaji Pav"
+    },
+    {
+        "id": 39,
+        "name": "Dal Makhani"
+    },
+    {
+        "id": 40,
+        "name": "Mushrooms"
+    },
+    {
+        "id": 41,
+        "name": "Egg Yolk "
+    },
+    {
+        "id": 42,
+        "name": "Masala Aloo"
+    },
+    {
+        "id": 43,
+        "name": "Tomato"
+    },
+    {
+        "id": 45,
+        "name": "Tomato Rice"
+    },
+    {
+        "id": 46,
+        "name": "Beans"
+    },
+    {
+        "id": 47,
+        "name": "Dal Fry"
+    }
+]

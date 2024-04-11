@@ -1,0 +1,102 @@
+[
+    {
+        "id": 3,
+        "name": "Bread made in wheat"
+    },
+    {
+        "id": 11,
+        "name": "Bananas"
+    },
+    {
+        "id": 10,
+        "name": "Coffee"
+    },
+    {
+        "id": 11,
+        "name": "Corn"
+    },
+    {
+        "id": 17,
+        "name": "Maggie"
+    },
+    {
+        "id": 18,
+        "name": "Orange"
+    },
+    {
+        "id": 19,
+        "name": "Pears"
+    },
+    {
+        "id": 20,
+        "name": "Aloo Matar "
+    },
+    {
+        "id": 21,
+        "name": "Sitafal"
+    },
+    {
+        "id": 23,
+        "name": "Rohu Curry"
+    },
+    {
+        "id": 32,
+        "name": "Sweet Potatoes "
+    },
+    {
+        "id": 29,
+        "name": "Poha"
+    },
+    {
+        "id": 30,
+        "name": "Chappati"
+    },
+    {
+        "id": 31,
+        "name": "Dahi"
+    },
+    {
+        "id": 33,
+        "name": "Dosa"
+    },
+    {
+        "id": 34,
+        "name": "Idli"
+    },
+    {
+        "id": 35,
+        "name": "White Rice"
+    },
+    {
+        "id": 40,
+        "name": "Orange juice"
+    },
+    {
+        "id": 44,
+        "name": "Cornflakes"
+    },
+    {
+        "id": 45,
+        "name": "Laal Chai"
+    },
+    {
+        "id": 48,
+        "name": "Chai"
+    },
+    {
+        "id": 49,
+        "name": "Apples"
+    },
+    {
+        "id": 50,
+        "name": "Strawberries"
+    },
+    {
+        "id": 39,
+        "name": "Sweet Dahi"
+    },
+    {
+        "id": 51,
+        "name": "Kiwi"
+    }
+]

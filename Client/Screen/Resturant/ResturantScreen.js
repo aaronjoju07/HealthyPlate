@@ -32,7 +32,6 @@ const MenuItem = ({ itemName, itemImage, dish }) => {
     }
     return (
         <View style={styles.menuItem}>
-
             <TouchableOpacity onPress={() => goToMenu()} style={styles.menuItemContainer}>
                 <Image source={{ uri: itemImage }} style={styles.menuItemImage} />
                 <View style={styles.itemDetails}>
@@ -61,14 +60,13 @@ const RestaurantScreen = ({ route }) => {
     const restaurantId = restaurant._id;
     const fetchReviews = async () => {
         try {
-            const response = await fetch(`http://localhost:5001/getRestaurantReviews/${restaurantId}`);
+            const response = await fetch(`${process.env.URL}/getRestaurantReviews/${restaurantId}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch reviews');
             }
 
             const data = await response.json();
             setReviews(data.data);
-            // console.log(data.data);
         } catch (error) {
             console.error('Error fetching reviews:', error);
         }
@@ -83,7 +81,6 @@ const RestaurantScreen = ({ route }) => {
         });
     }, [])
     const handleReviewSubmission = async (newReview) => {
-
         try {
             // console.log(newReview);
             const response = await axios.post(`http://localhost:5001/restaurants/${restaurantId}/reviews`, newReview, {
@@ -91,7 +88,6 @@ const RestaurantScreen = ({ route }) => {
                     'Content-Type': 'application/json',
                 },
             });
-
             const data = response.data;
             fetchReviews()
             // console.log('Response from server:', data);
@@ -104,9 +100,7 @@ const RestaurantScreen = ({ route }) => {
     return (
         <View style={styles.container}>
             <CartIcon />
-
             <ScrollView >
-
                 {/* Restaurant Image */}
                 <Image
                     source={{
@@ -124,8 +118,6 @@ const RestaurantScreen = ({ route }) => {
                         <Text style={styles.restaurantRating}>Rating: {restaurant.overallRating}</Text>
                     </View>
                 </View>
-
-
                 {/* Restaurant Menu */}
                 <View style={styles.menuContainer}>
                     <Text style={styles.menuHeader}>Menu</Text>
@@ -144,13 +136,9 @@ const RestaurantScreen = ({ route }) => {
                                     />
                                 ) : null
                             ))}
-
-
-
                         </View>
                     ))}
                 </View>
-
                 {/* About Section */}
                 <View style={styles.aboutContainer}>
                     <Text style={styles.aboutHeader}>About Us</Text>
@@ -158,7 +146,6 @@ const RestaurantScreen = ({ route }) => {
                         {restaurant.about}
                     </Text>
                 </View>
-
                 {/* Reviews Section */}
                 {/* User Review Input */}
                 <ReviewInput onSubmit={handleReviewSubmission} />
@@ -169,7 +156,6 @@ const RestaurantScreen = ({ route }) => {
                     {reviews.map((rest, index) => (
                         <ReviewCard key={index} comment={rest.comment} rating={rest.rating} />
                     ))}
-
                 </View>
             </ScrollView>
         </View>

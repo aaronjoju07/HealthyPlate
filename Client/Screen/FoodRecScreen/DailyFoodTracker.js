@@ -3,7 +3,8 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const DailyFoodTracker = () => {
+const DailyFoodTracker = ({route}) => {
+  const { foodList } = route.params;
   const [userIntake, setUserIntake] = useState({});
   const [deficiencies, setDeficiencies] = useState({});
   const [foodRecommendations, setFoodRecommendations] = useState({});
@@ -11,7 +12,7 @@ const DailyFoodTracker = () => {
   useEffect(() => {
     // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint
     axios.post('http://127.0.0.1:8001/recommend', {
-      user_daily_log: ["Poha", "Tomato", "Milk"]
+      user_daily_log: foodList
     })
       .then(response => {
         const { user_intake, deficiencies, food_recommendations } = response.data;

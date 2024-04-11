@@ -8,6 +8,8 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const { Restaurant } = require('./model/RestaurantModel');
 const HealthTracker = require('./model/healthTrackerSchema');
+const Food = require('./model/Food');
+const Order = require('./model/Order');
 
 
 dotenv.config();
@@ -392,6 +394,131 @@ app.get('/healthtracker/:userId/dailyprogression', (req, res) => {
         .catch(error => {
             res.status(500).json({ error: 'Internal Server Error' });
         });
+});
+
+// Create Food List
+app.post('/food-create', async (req, res) => {
+    try {
+        const { userId, breakfast, lunch, dinner } = req.body;
+        
+        // Check if a record exists for the user and the current day
+        let existingFood = await Food.findOne({ userId, date: { $eq: new Date().toISOString().slice(0, 10) } });
+        if (existingFood) {
+            // Update existing record
+            existingFood.breakfast = breakfast;
+            existingFood.lunch = lunch;
+            existingFood.dinner = dinner;
+            await existingFood.save();
+            res.status(200).json({ status: 'Success', data: existingFood });
+        } else {
+            // Create a new record
+            const newFood = new Food({ userId, date: new Date().toISOString().slice(0, 10), breakfast, lunch, dinner });
+            await newFood.save();
+            res.status(201).json({ status: 'Success', data: newFood });
+        }
+    } catch (error) {
+        console.error('Error saving food details:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+// Update-user-food
+app.put('/food/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const { breakfast, lunch, dinner } = req.body;
+    Food.findOneAndUpdate({ userId }, { breakfast, lunch, dinner }, { new: true })
+        .then(updatedFood => {
+            if (updatedFood) {
+                res.json({ status: 'Success', data: updatedFood });
+            } else {
+                res.status(404).json({ error: 'Food data not found for the user' });
+            }
+        })
+        .catch(error => {
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+// Read-user-food
+app.get('/food/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    const currentDate = new Date().toISOString().slice(0, 10); // Get current date in YYYY-MM-DD format
+
+    try {
+        const foundFood = await Food.findOne({ userId, date: currentDate });
+        if (foundFood) {
+            // console.log(foundFood);
+            res.json({ status: 'Success', data: foundFood });
+        } else {
+            res.status(404).json({ error: 'Food data not found for the user on the current day' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Food Read All
+app.get('/food-get-all', (req, res) => {
+    Food.find()
+        .then(allFood => {
+            res.json({ status: 'Success', data: allFood });
+        })
+        .catch(error => {
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+
+// Create an order
+app.post('/orders', async (req, res) => {
+    try {
+        const orderData = req.body;
+        const createdOrder = await Order.create(orderData);
+        res.status(201).json({ status: 'Success', data: createdOrder });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        console.log(error);
+    }
+});
+
+// Get all orders
+app.get('/orders', async (req, res) => {
+    try {
+        const orders = await Order.find();
+        res.json({ status: 'Success', data: orders });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Get an order by ID
+app.get('/orders/:orderId', async (req, res) => {
+    const orderId = req.params.orderId;
+    try {
+        const order = await Order.findById(orderId);
+        if (order) {
+            res.json({ status: 'Success', data: order });
+        } else {
+            res.status(404).json({ error: 'Order not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Update an order
+app.put('/orders/:orderId', async (req, res) => {
+    const orderId = req.params.orderId;
+    const updateData = req.body;
+    try {
+        const updatedOrder = await Order.findByIdAndUpdate(orderId, updateData, { new: true });
+        if (updatedOrder) {
+            res.json({ status: 'Success', data: updatedOrder });
+        } else {
+            res.status(404).json({ error: 'Order not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 // Port Initilization

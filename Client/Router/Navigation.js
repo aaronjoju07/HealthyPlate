@@ -12,6 +12,7 @@ import Registration from '../Screen/Registration';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CartScreen from '../Screen/Resturant/Cart/CartScreen';
 import DailyFoodTracker from '../Screen/FoodRecScreen/DailyFoodTracker';
+import EnterFoodDetails from '../Screen/FoodRecScreen/EnterFoodDetails';
 
 const Navigation = () => {
   const Stack = createNativeStackNavigator();
@@ -48,6 +49,7 @@ const Navigation = () => {
             <Stack.Screen name="Cart" component={CartScreen} />
             <Stack.Screen name="DailyFoodTracker" options={{ presentation: 'modal' }} component={DailyFoodTracker} />
             <Stack.Screen name="Order" options={{ presentation: 'modal' }} component={OrderScreen} />
+            <Stack.Screen name="EnterFoodDetais" component={EnterFoodDetails} />
             <Stack.Screen name="Login" component={Login} />
           </>
         ) : (

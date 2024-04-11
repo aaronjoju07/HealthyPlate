@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, Modal, TextInput, Button, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, Modal, TextInput, Button, StyleSheet, Dimensions, ScrollView, FlatList } from 'react-native';
 import { LineChart } from "react-native-chart-kit";
 import { calculateTrackingType } from '../Service/calculateTrackingType';
 import { calculateBMI } from '../Service/calculateBMI';
@@ -8,9 +8,29 @@ import GenderDropdown from '../Components/GenderDropdown';
 import calculateCalories from '../Service/calculateCalories';
 import { useSelector } from 'react-redux';
 import axios from 'axios'
+import MultiSelect from 'react-native-multiple-select';
 import { useNavigation } from '@react-navigation/native';
+import Breakfast from '../Data/Breakfast.json'
+import Lunch from '../Data/Lunch.json'
+import Dinner from '../Data/Dinner.json'
 
 const HealthTrackScreen = () => {
+  const items = Breakfast
+  const items2 = Lunch
+  const items3 = Dinner
+  const [selectedItems1, setSelectedItems1] = useState([]);
+  const [selectedItems2, setSelectedItems2] = useState([]);
+  const [selectedItems3, setSelectedItems3] = useState([]);
+  // Function to handle selected items change
+  const onSelectedItemsChange1 = (items) => {
+    setSelectedItems1(items);
+  };
+  const onSelectedItemsChange2 = (items) => {
+    setSelectedItems2(items);
+  };
+  const onSelectedItemsChange3 = (items) => {
+    setSelectedItems3(items);
+  };
 
   const userdata = useSelector((state) => state.user.user);
 
@@ -34,8 +54,8 @@ const HealthTrackScreen = () => {
 
   const [weightHistory, setWeightHistory] = useState([]);
 
-  const getWeightHistory = () => {
-    axios.get(`${process.env.URL}/healthtracker/${userdata._id}/weighthistory`)
+  const getWeightHistory = async () => {
+    await axios.get(`${process.env.URL}/healthtracker/${userdata._id}/weighthistory`)
       .then(response => {
         const weightHistory = response.data.data;
         setWeightHistory(weightHistory);
@@ -94,7 +114,6 @@ const HealthTrackScreen = () => {
     setBmiResult(bmi);
     const calculatedCalories = calculateCalories(currentWeight, currentHeight, age, Gender, activityFactor, trackingType)
     setCalculatedCalories(Math.abs(calculatedCalories))
-    // console.log(userdata);
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
     const healthTrackerData = {
@@ -222,6 +241,23 @@ const HealthTrackScreen = () => {
   };
 
   useEffect(() => {
+    const fetchFoodData = async () => {
+      try {
+        const response = await axios.get(`${process.env.URL}/food/${userdata._id}`);
+        const foodData = response.data;
+        console.log(foodData.data.breakfast);
+        // Extract breakfast, lunch, and dinner arrays from the foodData document
+        const { breakfast, lunch, dinner } = foodData.data;
+        // Set the selected items state with the retrieved data
+        setSelectedItems1(breakfast);
+        setSelectedItems2(lunch);
+        setSelectedItems3(dinner);
+      } catch (error) {
+        console.error('Error fetching food data:', error);
+      }
+    };
+
+    fetchFoodData();
     getTrackerDataExist();
     getWeightHistory();
     getOverallProgression();
@@ -231,24 +267,51 @@ const HealthTrackScreen = () => {
   const navigation = useNavigation();
   // Step 1: Add state for food details modal
   const [showFoodModal, setShowFoodModal] = useState(false);
-  const [foodDetails, setFoodDetails] = useState('');
 
   // Step 2: Add function to handle opening food details modal
   const handleOpenFoodModal = () => {
     setShowFoodModal(true);
   };
+  const handleViewButton = () =>{
+    navigation.navigate('DailyFoodTracker', { foodList: [...selectedItems1, ...selectedItems2, ...selectedItems3] });
+  }
 
   // Step 3: Add function to handle saving food details and redirecting
   const handleSaveFoodDetails = () => {
-    // Save food details (for example, you can update the state or send to backend)
-    // ...
+    // Check if selectedItems1, selectedItems2, and selectedItems3 are defined and not empty
+    if (!selectedItems1 || !selectedItems2 || !selectedItems3) {
+        console.error('Selected items are not defined or empty');
+        // Handle this case gracefully, perhaps show an error message to the user
+        return;
+    }
 
-    // Redirect to DailyFoodTracker page
-    navigation.navigate('DailyFoodTracker', { foodList: ["Poha", "Tomato", "Milk"] });
+    // Extract selected items from state
+    const breakfast = selectedItems1;
+    const lunch = selectedItems2;
+    const dinner = selectedItems3;
 
-    // Close the food details modal
-    setShowFoodModal(false);
-  };
+    // Send the selected items to the backend
+    axios.post(`${process.env.URL}/food-create`, {
+        userId: userdata._id,
+        breakfast,
+        lunch,
+        dinner,
+    })
+    .then(response => {
+        // Handle successful response from the backend
+        // console.log('Food details saved successfully:', response.data);
+        // Redirect to DailyFoodTracker page
+        navigation.navigate('DailyFoodTracker', { foodList: [...breakfast, ...lunch, ...dinner] });
+        // Close the food details modal
+        setShowFoodModal(false);
+    })
+    .catch(error => {
+        // Handle error from the backend
+        console.error('Error saving food details:', error);
+        // Show an error message to the user or handle as needed
+    });
+};
+
   return (
     <SafeAreaView style={styles.container}>
       {!dataSet && (
@@ -412,8 +475,6 @@ const HealthTrackScreen = () => {
               )}
             </View>
           )}
-
-
           {/* Update Weight Modal */}
           <Modal visible={showUpdateWeightModal} transparent={true} animationType="slide">
             <View style={styles.modalContainer}>
@@ -436,9 +497,12 @@ const HealthTrackScreen = () => {
 
 
           {/* Add button */}
-          <View style={{ alignItems: 'center' }} >
-            <TouchableOpacity onPress={handleOpenFoodModal} style={[styles.setTargetButton, { width: '90%' }]}>
+          <View style={{ alignItems: 'center',flexDirection:'row',justifyContent:'space-around' }} >
+            <TouchableOpacity onPress={handleOpenFoodModal} style={[styles.setTargetButton, { width: '40%' }]}>
               <Text style={styles.buttonText}>Enter Food Details</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleViewButton} style={[styles.setTargetButton, { width: '40%' }]}>
+              <Text style={styles.buttonText}>View</Text>
             </TouchableOpacity>
           </View>
 
@@ -447,12 +511,32 @@ const HealthTrackScreen = () => {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic' }}>Enter Food Details</Text>
-                <TextInput
-                  placeholder='"Poha", "Tomato", "Milk" etc. (comma-separated)'
-                  value={foodDetails}
-                  onChangeText={text => setFoodDetails(text)}
-                  multiline
-                  style={{ height: 100, borderColor: 'gray', borderWidth: 0.5, borderRadius: 8, marginTop: 10, paddingHorizontal: 8 }}
+                <FlatList
+                  data={[{ key: 'Breakfast', items: items }, { key: 'Lunch', items: items2 }, { key: 'Dinner', items: items3 }]}
+                  renderItem={({ item }) => (
+                    <View>
+                      <Text style={{ fontWeight: 'bold', marginTop: 10 }}>{item.key}</Text>
+                      <MultiSelect
+                        hideTags
+                        items={item.items}
+                        uniqueKey="name"
+                        onSelectedItemsChange={item.key === 'Breakfast' ? onSelectedItemsChange1 : item.key === 'Lunch' ? onSelectedItemsChange2 : onSelectedItemsChange3}
+                        selectedItems={item.key === 'Breakfast' ? selectedItems1 : item.key === 'Lunch' ? selectedItems2 : selectedItems3}
+                        selectText={item.name}
+                        searchInputPlaceholderText="Search Items..."
+                        tagRemoveIconColor="#CCC"
+                        tagBorderColor="#CCC"
+                        tagTextColor="#CCC"
+                        selectedItemTextColor="#CCC"
+                        selectedItemIconColor="#CCC"
+                        itemTextColor="#000"
+                        displayKey="name" // Displaying item names instead of IDs
+                        searchInputStyle={{ color: '#CCC' }}
+                        submitButtonColor="#CCC"
+                        submitButtonText="Select"
+                      />
+                    </View>
+                  )}
                 />
                 <View style={{ marginTop: 10, backgroundColor: 'rgba(255, 199, 0, 0.97)', borderRadius: 14 }}>
                   <Button title="Save and Close" color='white' onPress={handleSaveFoodDetails} />
@@ -460,6 +544,7 @@ const HealthTrackScreen = () => {
               </View>
             </View>
           </Modal>
+
         </View>
       )}
     </SafeAreaView>
@@ -510,6 +595,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     width: '90%',
     textAlign: 'center',
+    maxHeight: '90%',
+    marginBottom: 13
     // padding:5
   },
   progressContainer: {
@@ -519,7 +606,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 3,
     backgroundColor: 'rgba(255, 199, 7, .36)',
-    borderRadius: 10, // Set borderRadius to half of the height
+    borderRadius: 10,
     marginTop: 10,
     overflow: 'hidden',
     margin: 5,
