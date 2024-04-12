@@ -1,6 +1,6 @@
 import { useStripe } from '@stripe/stripe-react-native';
 import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, TextInput, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
@@ -98,9 +98,10 @@ const CartScreen = () => {
           </View>
         )}
       />
-{/* <View>
-      <LottieView style={{height:300,width:200}} source={require('../../../assets/Animations/Animation.json')} autoPlay />
-</View> */}
+<View>
+      {/* <Image source={require('../../../assets/Animations/bike.gif')} style={{ height: 200, width: 200 }} /> */}
+
+</View>
 
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total: ₹{roundedTotal}</Text>
