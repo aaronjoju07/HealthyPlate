@@ -3,6 +3,7 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import RestaurantSearchCard from '../Components/RestaurantSearchCard';
 import { useNavigation } from '@react-navigation/native';
+import PreviousOrder from '../Components/PreviousOrder';
 
 const Favorates = () => {
   const navigation = useNavigation()
@@ -49,6 +50,7 @@ const Favorates = () => {
               price={restaurant.price}
               imageSource={restaurant.imageSource}
             />
+            <PreviousOrder/>
           </TouchableOpacity>
         ))}
       </ScrollView>

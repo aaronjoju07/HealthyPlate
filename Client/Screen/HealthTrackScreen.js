@@ -176,7 +176,7 @@ const HealthTrackScreen = () => {
 
     axios.post(`${process.env.URL}/updateWeight`, updateWeightData)
       .then(response => {
-        console.log('Weight updated successfully:', response.data);
+        // console.log('Weight updated successfully:', response.data);
         getWeightHistory();
       })
       .catch(error => {
@@ -245,7 +245,6 @@ const HealthTrackScreen = () => {
       try {
         const response = await axios.get(`${process.env.URL}/food/${userdata._id}`);
         const foodData = response.data;
-        console.log(foodData.data.breakfast);
         // Extract breakfast, lunch, and dinner arrays from the foodData document
         const { breakfast, lunch, dinner } = foodData.data;
         // Set the selected items state with the retrieved data
@@ -272,7 +271,7 @@ const HealthTrackScreen = () => {
   const handleOpenFoodModal = () => {
     setShowFoodModal(true);
   };
-  const handleViewButton = () =>{
+  const handleViewButton = () => {
     navigation.navigate('DailyFoodTracker', { foodList: [...selectedItems1, ...selectedItems2, ...selectedItems3] });
   }
 
@@ -280,9 +279,9 @@ const HealthTrackScreen = () => {
   const handleSaveFoodDetails = () => {
     // Check if selectedItems1, selectedItems2, and selectedItems3 are defined and not empty
     if (!selectedItems1 || !selectedItems2 || !selectedItems3) {
-        console.error('Selected items are not defined or empty');
-        // Handle this case gracefully, perhaps show an error message to the user
-        return;
+      console.error('Selected items are not defined or empty');
+      // Handle this case gracefully, perhaps show an error message to the user
+      return;
     }
 
     // Extract selected items from state
@@ -292,25 +291,25 @@ const HealthTrackScreen = () => {
 
     // Send the selected items to the backend
     axios.post(`${process.env.URL}/food-create`, {
-        userId: userdata._id,
-        breakfast,
-        lunch,
-        dinner,
+      userId: userdata._id,
+      breakfast,
+      lunch,
+      dinner,
     })
-    .then(response => {
+      .then(response => {
         // Handle successful response from the backend
         // console.log('Food details saved successfully:', response.data);
         // Redirect to DailyFoodTracker page
         navigation.navigate('DailyFoodTracker', { foodList: [...breakfast, ...lunch, ...dinner] });
         // Close the food details modal
         setShowFoodModal(false);
-    })
-    .catch(error => {
+      })
+      .catch(error => {
         // Handle error from the backend
         console.error('Error saving food details:', error);
         // Show an error message to the user or handle as needed
-    });
-};
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -479,7 +478,7 @@ const HealthTrackScreen = () => {
           <Modal visible={showUpdateWeightModal} transparent={true} animationType="slide">
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic' }}>Update Current Weight</Text>
+                <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic' ,margin:1 }}>Update Current Weight</Text>
                 <View style={styles.inputBox}>
                   <TextInput
                     placeholder="Current Weight (kg)"
@@ -491,13 +490,16 @@ const HealthTrackScreen = () => {
                 <View style={{ backgroundColor: 'rgba(255, 199, 0, 0.97)', borderRadius: 14, }}>
                   <Button title="Update Weight" color='white' onPress={handleUpdateWeight} />
                 </View>
+                <TouchableOpacity onPress={() => setShowUpdateWeightModal(false)} style={styles.backButton}>
+                  <Text style={styles.backButtonText}>Back</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </Modal>
 
 
           {/* Add button */}
-          <View style={{ alignItems: 'center',flexDirection:'row',justifyContent:'space-around' }} >
+          <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-around' }} >
             <TouchableOpacity onPress={handleOpenFoodModal} style={[styles.setTargetButton, { width: '40%' }]}>
               <Text style={styles.buttonText}>Enter Food Details</Text>
             </TouchableOpacity>
@@ -541,6 +543,9 @@ const HealthTrackScreen = () => {
                 <View style={{ marginTop: 10, backgroundColor: 'rgba(255, 199, 0, 0.97)', borderRadius: 14 }}>
                   <Button title="Save and Close" color='white' onPress={handleSaveFoodDetails} />
                 </View>
+                <TouchableOpacity onPress={() => setShowFoodModal(false)} style={styles.backButton}>
+                  <Text style={styles.backButtonText}>Back</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </Modal>
@@ -555,6 +560,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 1
+  },
+  backButtonText: {
+    fontSize: 16,
+    textAlign:'center',
+    margin:10
   },
   setTargetButton: {
     justifyContent: 'center',

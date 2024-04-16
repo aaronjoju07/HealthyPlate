@@ -8,15 +8,15 @@ import { addToCart, clearCart, removeFromCart } from '../../reducer/cart/cartSli
 import ReviewInput from '../../Components/Review/ReviewInput.js';
 import axios from 'axios'
 
-const MenuItem = ({ itemName, itemImage, dish }) => {
+const MenuItem = ({ itemName, itemImage, dish ,restaurantName,restaurantImage}) => {
     const navigation = useNavigation();
     const [quantity, setQuantity] = useState(0);
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
     const incrementQuantity = () => {
         setQuantity(quantity + 1);
-        dispatch(addToCart({ dish, quantity: 1 }));
-    };
+        dispatch(addToCart({ dish, quantity: 1, restaurantName: restaurantName, restaurantImage: restaurantImage }));
+    };    
     const decrementQuantity = () => {
         if (quantity > 0) {
             setQuantity(quantity - 1);
@@ -133,6 +133,8 @@ const RestaurantScreen = ({ route }) => {
                                         itemName={dish.dishName}
                                         itemImage={dish.imageUrl}
                                         dish={dish}
+                                        restaurantName={restaurant.restaurantName}
+                                        restaurantImage={restaurant.imageAddress}
                                     />
                                 ) : null
                             ))}

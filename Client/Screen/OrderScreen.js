@@ -1,136 +1,182 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Modal, Button, TouchableOpacity, Image } from 'react-native';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const OrderScreen = () => {
-  const orders = [
-    { id: '1', itemName: 'Burger', quantity: 2, price: '$10.00', status: 'Pending Delivery' },
-    { id: '2', itemName: 'Pizza', quantity: 1, price: '$15.00', status: 'Delivered' },
-    { id: '3', itemName: 'Pasta', quantity: 3, price: '$8.00', status: 'Pending Delivery' },
-    // Add more orders as needed
-  ];
+  const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const user = useSelector((state) => state.user.user);
 
-  // Separate orders into Pending Delivery and Previous History
-  const pendingDeliveryOrders = orders.filter(order => order.status === 'Pending Delivery');
-  const previousHistoryOrders = orders.filter(order => order.status !== 'Pending Delivery');
+  useEffect(() => {
+    fetchOrders(); // Fetch orders when component mounts
+  }, []);
 
-  const renderOrderItem = (item) => (
-    <TouchableOpacity key={item.id}>
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${process.env.URL}/orders/${user.email}`);
+      setOrders(response.data.data);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  };
 
-    <View style={styles.orderItem}>
-      <Image source={require('../assets/images/coverLogo.png')} style={styles.itemImage} />
-      <View style={styles.itemDetails}>
-        <Text style={styles.itemName}>{item.itemName}</Text>
-        <Text>Quantity: {item.quantity}</Text>
-        <Text>Total Price: {item.price}</Text>
-        <Text>Status: {item.status}</Text>
-      </View>
-      <FontAwesomeIcon icon={faChevronRight} size={24} color="rgba(255, 199, 0, 0.35)" />
+  const handleOrderPress = (order) => {
+    setSelectedOrder(order);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const renderOrderItem = ({ item }) => (
+    <TouchableOpacity onPress={() => handleOrderPress(item)}>
+  <View style={styles.orderItem}>
+    <Image source={{ uri: item.restaurantImage }} style={styles.restaurantImage} />
+    <View style={styles.orderDetails}>
+      <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+      <Text>Total: ${item.totalAmount.toFixed(2)}</Text>
+      <Text>Status: {item.orderStatus}</Text>
     </View>
-    </TouchableOpacity>
+  </View>
+</TouchableOpacity>
+
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Text style={styles.headerText}>My Orders</Text>
 
-
-      {/* Pending Delivery Orders */}
-      <View style={styles.sectionContainer}>
-        <View style={styles.header}>
-        <Text style={styles.sectionHeader}>Pending Delivery</Text>
-        </View>
+      {/* Render orders or display no orders image */}
+      {orders.length > 0 ? (
         <FlatList
-          data={pendingDeliveryOrders}
-          renderItem={({ item }) => renderOrderItem(item)}
-          keyExtractor={(item) => item.id}
+          data={orders}
+          renderItem={renderOrderItem}
+          keyExtractor={item => item._id}
         />
-      </View>
-
-      <View style={styles.sectionContainer}>
-        <View style={styles.header}>
-        <Text style={styles.sectionHeader}>Previous History</Text>
+      ) : (
+        <View style={styles.noOrdersContainer}>
+          <Image source={require('../assets/noOrder.png')} style={styles.noOrdersImage} />
+          <Text style={styles.noOrdersText}>No orders found</Text>
         </View>
-        <FlatList
-          data={previousHistoryOrders}
-          renderItem={({ item }) => renderOrderItem(item)}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-    </SafeAreaView>
+      )}
+
+      {/* Modal for detailed order view */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Order Details</Text>
+            {selectedOrder && (
+              <View>
+                <Text>Restaurant: {selectedOrder.restaurantName}</Text>
+                <Text>Total Amount: ${selectedOrder.totalAmount}</Text>
+                <Text>Status: {selectedOrder.orderStatus}</Text>
+                <Text>Items:</Text>
+                <FlatList
+                  data={selectedOrder.items}
+                  renderItem={({ item }) => (
+                    <View style={styles.itemContainer}>
+                      <Text>{item.dishName}</Text>
+                      <Text>${item.price}</Text>
+                    </View>
+                  )}
+                  keyExtractor={(item, index) => index.toString()}
+                />
+              </View>
+            )}
+            <Button title="Close" onPress={closeModal} color="red" />
+          </View>
+        </View>
+      </Modal>
+
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
     padding: 10,
-    backgroundColor: '#fff'
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   headerText: {
     fontSize: 24,
-    fontWeight: 'bold', color: 'black'
-  },
-  sectionContainer: {
-    marginBottom: 20,
-  },
-  sectionHeader: {
-    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#c51717',
+    marginBottom: 20,
+    color: 'black',
   },
   orderItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white', // Add a background color here
-    borderColor: 'rgba(255, 199, 0, 0.35)',
-    padding: 15,
+    borderWidth: 1,
+    borderColor: 'black',
+    padding: 10,
     marginBottom: 10,
-    margin: 9,
-    borderRadius: 10,
-    borderWidth: 2,
-    // 3D shadow properties
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 1,
-    // Android elevation (if needed)
-    elevation: 0.5,
+    borderRadius:10,
+    
   },
-  
-  itemImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
+  restaurantImage: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+    borderRadius: 25, // Rounded corners
   },
-  itemDetails: {
+  orderDetails: {
     flex: 1,
-    marginLeft: 15,
   },
-  itemName: {
-    fontSize: 16,
+  restaurantName: {
     fontWeight: 'bold',
+    marginBottom: 5,
   },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-    margin: 10
+  restaurantName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
-  divider: {
+  noOrdersContainer: {
     flex: 1,
-    height: 1,
-    backgroundColor: 'gray',
-
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noOrdersImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  noOrdersText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#888',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // White background with transparency
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
   },
 });
 
