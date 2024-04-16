@@ -489,9 +489,24 @@ app.get('/orders', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+// Get all orders by user ID
+app.get('/orders/:customerEmail', async (req, res) => {
+    const customerEmail = req.params.customerEmail;
+
+    try {
+        const userOrders = await Order.find({ customerEmail });
+        if (userOrders.length > 0) {
+            res.json({ status: 'Success', data: userOrders });
+        } else {
+            res.status(404).json({ error: 'No orders found for the user' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 // Get an order by ID
-app.get('/orders/:orderId', async (req, res) => {
+app.get('/orders-by-id/:orderId', async (req, res) => {
     const orderId = req.params.orderId;
     try {
         const order = await Order.findById(orderId);

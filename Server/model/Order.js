@@ -1,15 +1,18 @@
 const mongoose = require('mongoose');
 
-// Define the order item schema
 const orderItemSchema = new mongoose.Schema({
   dishName: {
+    type: String,
+    required: true,
+  },
+  dishImage: {
     type: String,
     required: true,
   },
   quantity: {
     type: Number,
     required: true,
-    default: 1, // Default quantity is 1
+    default: 1, 
   },
   price: {
     type: Number,
@@ -31,15 +34,23 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  items: [orderItemSchema], // Array of order items
+  items: [orderItemSchema], 
   totalAmount: {
     type: Number,
+    required: true,
+  },
+  restaurantName: {
+    type: String,
+    required: true,
+  },
+  restaurantImage: {
+    type: String,
     required: true,
   },
   orderStatus: {
     type: String,
     enum: ['Pending', 'Processing', 'Completed', 'Cancelled'],
-    default: 'Pending', // Default status is pending
+    default: 'Pending', 
   },
   createdAt: {
     type: Date,
@@ -47,7 +58,6 @@ const orderSchema = new mongoose.Schema({
   },
 });
 
-// Create the Order model
 const Order = mongoose.model('Order', orderSchema);
 
 module.exports = Order;
