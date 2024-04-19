@@ -37,11 +37,14 @@ const ProfileScreen = () => {
   const handleLogoutAccount = () => {
     AsyncStorage.setItem('isLogin','')
     AsyncStorage.setItem('token','')
-    dispatch(clearUser());
+    navigation.navigate('Login');
     setTimeout(() => {
       Alert.alert('Success', 'LOGOUT successful!');
+      //  dispatch(clearUser());
     }, 500);
-    navigation.navigate('Login');
+    
+    
+
   };
 
   const handleFav = () => {
@@ -62,26 +65,12 @@ const ProfileScreen = () => {
         <Text style={styles.userName}>{user.name}</Text>
 
         {/* Buttons */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[styles.button, styles.editButton]}
           onPress={handleEditProfile}
         >
           <Text style={styles.buttonText}>Edit Profile</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.passwordButton]}
-          onPress={handleResetPassword}
-        >
-          <Text style={styles.buttonText}>Reset Password</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.favoriteButton]}
-          onPress={handleFav}
-        >
-          <Text style={styles.buttonText}>Favorites</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={[styles.button, styles.orderButton]}
@@ -103,13 +92,6 @@ const ProfileScreen = () => {
         >
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.loutButton]}
-          onPress={handleDeleteAccount}
-        >
-          <Text style={styles.buttonText}>Delete Account</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -123,7 +105,7 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: 'center',
-    marginTop: -75, // Adjust based on the cover photo height
+    marginTop: -75, 
   },
   avatar: {
     width: 100,

@@ -23,10 +23,10 @@ const Login = () => {
           if (res.data.status === 'ok') {
             AsyncStorage.setItem("token", res.data.data);
             AsyncStorage.setItem("isLogin", JSON.stringify(true));
-            // setTimeout(() => {
-            //   Alert.alert('Success', 'Login successful!');
-            // }, 500);
             navigation.navigate('TabNavigation');
+          }
+          else{
+            Alert.alert('Info', 'Enter valid emailId and password');
           }
         })
         .catch((error) => {

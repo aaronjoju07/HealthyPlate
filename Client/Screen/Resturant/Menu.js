@@ -31,7 +31,7 @@ const Menu = ({route}) => {
         </View>
         <Text style={styles.ingredientsHeader}>Ingredients:</Text>
       {item.item.dish.ingredients.map((ingredient, index) => (
-  renderIngredientItem(ingredient.ingredientName, 'https://png.pngtree.com/png-clipart/20231115/original/pngtree-food-ingredients-sample-photo-png-image_13549224.png',keyof=ingredient._id) // Replace this URL with the actual URL for each ingredient
+  renderIngredientItem(ingredient.ingredientName, 'https://www.foodingredientfacts.org/wp-content/uploads/2017/11/AdobeStock_49033437-dont-fear-ingredients-in-your-food-1024x783.jpeg',keyof=ingredient._id) // Replace this URL with the actual URL for each ingredient
 ))}
       </View>
     </SafeAreaView>
@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginRight: 8,
+    borderRadius:10
   },
   ingredientsHeader: {
     fontSize: 18,

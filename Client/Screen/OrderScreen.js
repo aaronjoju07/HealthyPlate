@@ -76,7 +76,7 @@ const OrderScreen = () => {
             {selectedOrder && (
               <View>
                 <Text>Restaurant: {selectedOrder.restaurantName}</Text>
-                <Text>Total Amount: ${selectedOrder.totalAmount}</Text>
+                <Text>Total Amount: ${selectedOrder.totalAmount.toFixed(2)}</Text>
                 <Text>Status: {selectedOrder.orderStatus}</Text>
                 <Text>Items:</Text>
                 <FlatList

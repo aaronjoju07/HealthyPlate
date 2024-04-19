@@ -69,7 +69,7 @@ const HealthTrackScreen = () => {
     axios.get(`${process.env.URL}/healthtracker/${userdata._id}/overallprogression`)
       .then(response => {
         const overallProgression = response.data.data;
-        // console.log('Overall Progression:', overallProgression);
+        console.log('Overall Progression:', overallProgression);
       })
       .catch(error => {
         console.error('Error fetching overall progression:', error);
@@ -297,17 +297,11 @@ const HealthTrackScreen = () => {
       dinner,
     })
       .then(response => {
-        // Handle successful response from the backend
-        // console.log('Food details saved successfully:', response.data);
-        // Redirect to DailyFoodTracker page
         navigation.navigate('DailyFoodTracker', { foodList: [...breakfast, ...lunch, ...dinner] });
-        // Close the food details modal
         setShowFoodModal(false);
       })
       .catch(error => {
-        // Handle error from the backend
         console.error('Error saving food details:', error);
-        // Show an error message to the user or handle as needed
       });
   };
 
@@ -406,11 +400,6 @@ const HealthTrackScreen = () => {
 
           {/* Progress bars */}
           <View style={styles.progressContainer}>
-            <Text>Daily Tracking Progress {dailyProgress}%</Text>
-            <View style={styles.progressBar}>
-              <View style={{ width: `${dailyProgress}%`, height: 20, backgroundColor: 'rgba(255, 199, 7, 10)' }} />
-            </View>
-
             <Text>Overall Tracking Progress {overallProgress}%</Text>
             <View style={styles.progressBar}>
               <View style={{ width: `${overallProgress}%`, height: 20, backgroundColor: 'rgba(255, 199, 7, 10)' }} />
@@ -478,7 +467,7 @@ const HealthTrackScreen = () => {
           <Modal visible={showUpdateWeightModal} transparent={true} animationType="slide">
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic' ,margin:1 }}>Update Current Weight</Text>
+                <Text style={{ textAlign: 'center', fontSize: 20, fontStyle: 'italic', margin: 1 }}>Update Current Weight</Text>
                 <View style={styles.inputBox}>
                   <TextInput
                     placeholder="Current Weight (kg)"
@@ -499,6 +488,9 @@ const HealthTrackScreen = () => {
 
 
           {/* Add button */}
+          <View style={{justifyContent:'center',alignItems:'center'}}>
+          <Text style={styles.chartTitle}>Health & Nutrition Tracker</Text>
+          </View>
           <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-around' }} >
             <TouchableOpacity onPress={handleOpenFoodModal} style={[styles.setTargetButton, { width: '40%' }]}>
               <Text style={styles.buttonText}>Enter Food Details</Text>
@@ -563,8 +555,8 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    textAlign:'center',
-    margin:10
+    textAlign: 'center',
+    margin: 10
   },
   setTargetButton: {
     justifyContent: 'center',

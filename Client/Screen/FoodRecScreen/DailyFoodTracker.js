@@ -10,7 +10,6 @@ const DailyFoodTracker = ({route}) => {
   const [foodRecommendations, setFoodRecommendations] = useState({});
 
   useEffect(() => {
-    // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint
     axios.post('http://127.0.0.1:8001/recommend', {
       user_daily_log: foodList
     })
@@ -35,7 +34,6 @@ const DailyFoodTracker = ({route}) => {
           <Text style={styles.infoText}>Food Items: {userIntake.Food_items}</Text>
           <Text style={styles.infoText}>Calories: {userIntake.Calories}</Text>
           <Text style={styles.infoText}>Carbohydrates: {userIntake.Carbohydrates}</Text>
-          {/* Add more details as needed */}
         </View>
 
         <View style={styles.section}>

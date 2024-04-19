@@ -5,8 +5,6 @@ app = Flask(__name__)
 
 data_path = 'diet_recommendation_system.csv'
 df = pd.read_csv(data_path)
-
-
 daily_requirements = {
     'Calories': 2000,
     'Fats': 70,  # in grams
@@ -36,16 +34,9 @@ def recommend_foods(deficiencies):
 @app.route('/recommend', methods=['POST'])
 def recommend():
     try:
-
         user_daily_log = request.json.get('user_daily_log', [])
-
-
         user_intake = log_user_daily_intake(user_daily_log)
-
-
         deficiencies = {nutrient: daily_requirements[nutrient] - user_intake.get(nutrient, 0) for nutrient in daily_requirements}
-
-
         food_recommendations = recommend_foods(deficiencies)
 
         return jsonify({
