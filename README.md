@@ -25,11 +25,11 @@ Let's collaborate to revolutionize how individuals approach dining out and foste
 
 **Stay Healthy, Eat Smart!**
 
+![User Registration and Login](Images/Untitled%20presentation.png)
+![Home Page and Restaurant Module](Images/Untitled%20presentation%20(1).png)
+![Cart](Images/Untitled%20presentation%20(2).png)
+![Payment](Images/Untitled%20presentation%20(3).png)
+![Order](Images/Untitled%20presentation%20(4).png)
+![Search](Images/Untitled%20presentation%20(5).png)
+![Health Tracker Module](Images/Untitled%20presentation%20(6).png)
 
-![User Registration and Login](Images/Untitled presentation.png)
-![Home Page and Restaurant Module](Images/Untitled presentation (1).png)
-![Cart](Images/Untitled presentation (2).png)
-![Payment](Images/Untitled presentation (3).png)
-![Order]Images/Untitled presentation (4).png)
-![Search](Images/Untitled presentation (5).png)
-![Health Tracker Module ](Images/Untitled presentation (6).png)
