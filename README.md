@@ -24,3 +24,12 @@ HealthyPlate is a revolutionary mobile application designed to address the chall
 Let's collaborate to revolutionize how individuals approach dining out and foster a healthier, informed community! 🌱💪
 
 **Stay Healthy, Eat Smart!**
+
+
+![User Registration and Login](Images/Untitled presentation.png)
+![Home Page and Restaurant Module](Images/Untitled presentation (1).png)
+![Cart](Images/Untitled presentation (2).png)
+![Payment](Images/Untitled presentation (3).png)
+![Order]Images/Untitled presentation (4).png)
+![Search](Images/Untitled presentation (5).png)
+![Health Tracker Module ](Images/Untitled presentation (6).png)
