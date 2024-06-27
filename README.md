@@ -1,20 +1,66 @@
-**HealthyPlate: Empowering Informed Dining Choices**
+# **HealthyPlate: Empowering Informed Dining Choices**
 
 Welcome to the HealthyPlate repository! 🥗📱
 
 **Overview:**
-HealthyPlate is a revolutionary mobile application designed to address the challenges of making healthy dining choices in a fast-paced world. This repository contains the source code and documentation for the HealthyPlate app, aiming to empower users with detailed nutritional breakdowns, personalized recommendations, and a transparent, user-centric approach to dining out.
+The Healthy Plate app aims to revolutionize how individuals approach ordering food, providing a comprehensive solution for informed and healthy food selections. It addresses the challenge faced by health-conscious individuals when navigating menus filled with hidden calories and limited nutritional information.
 
-**Key Features:**
-- **Nutritional Information Retrieval:** Retrieve and display detailed dietary information for a wide range of dishes from various restaurants.
-- **Personalized Recommendations:** Get tailored nutrition recommendations based on your preferences, dietary goals, and restrictions.
-- **Clear Menu Labelling:** Easily identify dishes that align with your health needs with clear menu labelling.
-- **User Reviews and Ratings:** Contribute and view authentic reviews and ratings for restaurants and specific dishes to make informed decisions.
-- **Intuitive User Interface:** Effortlessly navigate and access information with our user-friendly interface.
-- **Personalization Interface:** Input and modify your preferences, dietary goals, and restrictions for personalized recommendations.
-- **Cross-Platform Compatibility:** Compatible with iOS and Android for a seamless user experience.
-- **Scalable Database:** Designed to handle a growing database of nutritional information and restaurant details as our user base expands.
-- **Compliance with Food Safety Standards:** Adheres to relevant food safety standards and regulations when providing nutritional information.
+The app includes features for tracking weight with respect to BMI values and gender-specific recommendations. It calculates and suggests calorie intake based on targeted weight goals. Additionally, it offers a micronutrient service to track calories, proteins, carbohydrates, and other nutritional elements, highlighting deficiencies based on daily meal inputs.
+
+## Features
+
+- **BMI Calculation and Tracking**
+  - Calculate BMI based on user inputs (height, weight).
+  - Track BMI changes over time.
+
+- **Calorie Intake Suggestions**
+  - Recommend daily calorie intake based on user's weight goals (e.g., weight loss, maintenance, gain).
+
+- **Nutritional Analysis**
+  - Micronutrient service to analyze daily intake of calories, proteins, carbohydrates, etc.
+  - Highlight deficiencies and suggest improvements.
+
+- **Meal Logging**
+  - Log breakfast, lunch, dinner, and snacks.
+  - Analyze nutritional content of each meal.
+
+- **User Profile**
+  - Maintain user profiles with basic information (age, gender, weight, height).
+  - Customize nutritional recommendations based on user preferences.
+
+
+## Usage
+
+1. **Sign Up or Log In:**
+- Create a new account or log in with existing credentials.
+
+2. **Set Your Goals:**
+- Enter your weight goal and select the desired outcome (lose weight, maintain weight, gain weight).
+
+3. **Log Your Meals:**
+- Log what you eat for breakfast, lunch, dinner, and snacks.
+- Add details about portion sizes and ingredients.
+
+4. **View Recommendations:**
+- See recommended calorie intake based on your goals.
+- Monitor BMI changes over time.
+
+5. **Track Nutrition:**
+- Use the micronutrient service to analyze your intake of calories, proteins, carbohydrates, and other nutrients.
+- Receive alerts for any deficiencies based on your meal inputs.
+
+## Technologies Used
+
+- **Frontend:**
+- React.js
+- Redux (for state management)
+- Stripe (for Payment)
+
+- **Backend:**
+- Node.js
+- Express.js
+- MongoDB (or your preferred database)
+
 
 **How to Contribute:**
 1. Fork the repository.
